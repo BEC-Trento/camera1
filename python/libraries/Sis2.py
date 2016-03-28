@@ -7,6 +7,8 @@ Created on Fri Mar 25 2016
 """
 
 import numpy as np
+import time
+import datetime
 
 
 def readsis(filename):
@@ -53,7 +55,7 @@ def readsis(filename):
 
     return im0, im1, image, rawdata #, image.shape
 
-def sis_write(self, image, filename):
+def sis_write(self, image, filename, stamp):
         """
         Low-level interaction with the sis file for writing it.
         Writes the whole image, with the unused part filled with zeros.
@@ -71,16 +73,9 @@ def sis_write(self, image, filename):
             image = np.concatenate((np.zeros_like(image), image))
 
         with open(str(filename), 'w+b') as fid:
-            # Write here SisV2 - 5 bytes
-            ##fid.write('0'*10) #skip unused
-            head = 'SisV2'
+            # Write here SisV2 + other 4 free bytes
+            head = 'SisV2' + '.' + '0'*4
             fid.write(head.encode())
-            #fid.write('S')
-            #fid.write('i')
-            #fid.write('s')
-            #fid.write('V')
-            #fid.write('2')
-            #fid.write('0'*5)
 
             # This is OK
             height, width = image.shape
@@ -88,9 +83,19 @@ def sis_write(self, image, filename):
             size.tofile(fid)
 
             # Here we put 2*2 more bytes with the sub-block dimension
+            Bheight, Bwidth = 300, 200
+            Bsize = np.array([Bheight, Bwidth], dtype=np.uint16)
+            Bsize.tofile(fid)
+
             # Also a timestamp
+            ts = time.time()
+            phead = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+            fid.write(phead.encode())
+
             # More?
-            ##fid.write('0'*182)
-            ##fid.write('0'*4) #skip offset
+            fid.write(stamp.encode())
+            freeHead = '0'*(475-len(stamp))
+            #freeHead = '0'*163
+            fid.write(freeHead.encode())
 
             image.astype(np.uint16).tofile(fid)
