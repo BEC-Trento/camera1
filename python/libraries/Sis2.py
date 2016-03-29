@@ -49,9 +49,9 @@ def readsis(filename):
     f = open(filename, 'rb')        # open in reading and binary mode
     header = f.read(512)            # read the fixed size header: 512 bytes
     if header[0] == 48:             # 48 is ASCII code for '0': all older sis start with 0
-        sisVersion = 'sis1'
-        datestamp = 'we do not know'
-        comment = 'nothing'
+        sisVersion = '  sis1'
+        datestamp = ' we do not know'
+        comment = ' nothing'
     elif header[0:5] == b'SisV2':   # SisV2 print header
         sisVersion = str(header[0:5])
         datestamp = str(header[18:37])
@@ -63,7 +63,7 @@ def readsis(filename):
     print("You are opening the " + sisVersion[2:-1] + " file: " + filename)
     print("It says: " + comment[1:])
     print("...and was created on " + datestamp[1:])
-    f.close
+    f.close()
     # Sometimes it gives error if the file is opened a sigle time
 
     f = open(filename, 'rb')                        # open in reading and binary mode
@@ -73,7 +73,7 @@ def readsis(filename):
     # put in an array the data formatted uint16 and casted to int
     ''' NB fundamental to cast to int:
         unsigned short gives overflow '''
-    f.close
+    f.close()
 
     # Dimension of the whole image
     width=rawdata[6]  # N cols
