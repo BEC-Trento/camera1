@@ -55,14 +55,12 @@ def readsis(filename):
     elif header[0:5] == b'SisV2':   # SisV2 print header
         sisVersion = str(header[0:5])
         datestamp = str(header[18:37])
-        comment = str(header[37:56])
+        comment = str(header[40:])
     else:
         print('What fuck are you opening?')
         return True
 
     print("You are opening the " + sisVersion[2:-1] + " file: " + filename)
-    print("It says: " + comment[1:])
-    print("...and was created on " + datestamp[1:])
     f.close()
     # Sometimes it gives error if the file is opened a sigle time
 
@@ -83,6 +81,10 @@ def readsis(filename):
     Bwidth=rawdata[8]  # N subcols
     Bheight=rawdata[7] # N subrows
 
+    # Length of comments
+    ls = rawdata[19]
+    print(ls)
+
     # Reading the images
     image = rawdata[-width*height:]
     image.resize(height,width)
@@ -91,8 +93,14 @@ def readsis(filename):
     im0 = image[:height//2, :]
     im1 = image[height//2:, :]
 
-    stringa = sisVersion[1:-1] + ' ' + datestamp[2:-1] + ' ' + comment[2:]
+    if header[0] == 48:
+        stringa = sisVersion[1:-1] + ' ' + datestamp[2:-1] + ' ' + comment[2:]
+    elif header[0:5] == b'SisV2':
+        stringa = sisVersion[1:-1] + ' ' + datestamp[2:-1] + ' ' + comment[2:ls+2]
     block = (Bheight,Bwidth)
+
+    print("It says: " + comment[1:ls+2])
+    print("...and was created on " + datestamp[1:])
 
     return im0, im1, image, rawdata, stringa , block
 
@@ -132,12 +140,14 @@ def sis_write(self, image, filename, Bheight, Bwidth, stamp):
 
             # Also a timestamp
             ts = time.time()
-            phead = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+            phead = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S.')
             fid.write(phead.encode())
 
             # More: descriptive stamp
+            ls = np.array([len(stamp)], dtype=np.uint16)
+            ls.tofile(fid)
             fid.write(stamp.encode())
-            freeHead = '0'*(475-len(stamp))
+            freeHead = '0'*(472-len(stamp))
             fid.write(freeHead.encode())
 
             image.astype(np.uint16).tofile(fid)
