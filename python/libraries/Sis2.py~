@@ -83,7 +83,6 @@ def readsis(filename):
 
     # Length of comments
     ls = rawdata[19]
-    print(ls)
 
     # Reading the images
     image = rawdata[-width*height:]
@@ -144,7 +143,7 @@ def sis_write(self, image, filename, Bheight, Bwidth, stamp):
             fid.write(phead.encode())
 
             # More: descriptive stamp
-            ls = np.array([len(stamp)], dtype=np.uint16)
+            ls = np.array([len(stamp)], dtype=np.uint16) # length of the stamp coded at the 38+39 byte
             ls.tofile(fid)
             fid.write(stamp.encode())
             freeHead = '0'*(472-len(stamp))

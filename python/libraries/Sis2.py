@@ -98,7 +98,7 @@ def readsis(filename):
         stringa = sisVersion[1:-1] + ' ' + datestamp[2:-1] + ' ' + comment[2:ls+2]
     block = (Bheight,Bwidth)
 
-    print("It says: " + comment[1:ls+2])
+    print("It says: " + comment[1:ls+2] + "...")
     print("...and was created on " + datestamp[1:])
 
     return im0, im1, image, rawdata, stringa , block
