@@ -32,6 +32,21 @@ class MyHandler(PatternMatchingEventHandler):
     def on_created(self, event):
         self.process(event)
 
+def FWatch(checkPath):
+    observer = Observer()
+    observer.schedule(MyHandler(), path=checkPath)
+    observer.start()
+
+    print("Osservo!")
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+
+    observer.join()
+
 if __name__ == '__main__':
     args = sys.argv[1:]
     observer = Observer()

@@ -4,7 +4,7 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
 class MyHandler(PatternMatchingEventHandler):
-    patterns=["test-*.ppm"]         # Pass the string with the user defined number image
+    patterns=["*.ppm"]         # Pass the string with the user defined number image
 
     def process(self, event):
         """
@@ -31,6 +31,21 @@ class MyHandler(PatternMatchingEventHandler):
 
     def on_created(self, event):
         self.process(event)
+
+def FWatch(checkPath)
+    observer = Observer()
+    observer.schedule(MyHandler(), path=checkPath)
+    observer.start()
+
+    print("Osservo!")
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+
+    observer.join()
 
 if __name__ == '__main__':
     args = sys.argv[1:]
