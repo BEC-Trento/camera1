@@ -1,0 +1,5 @@
+def on():
+    print("Processing!")
+
+def off():
+    print("Ready!")

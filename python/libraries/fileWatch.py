@@ -3,8 +3,11 @@ import time
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
+from libraries import params        # General parameters
+from libraries import process       # Process library: specific of the project
+
 class MyHandler(PatternMatchingEventHandler):
-    patterns=["*.ppm"]         # Pass the string with the user defined number image
+    patterns = params.patterns      # Pass the string with the user defined number image through a parameters file
 
     def process(self, event):
         """
@@ -19,10 +22,11 @@ class MyHandler(PatternMatchingEventHandler):
         print(str(event.src_path) + ' ' + str(event.event_type))
 
         if event.event_type == 'deleted':
-            print("The raw file has been deleted: Ready!")
+            print("The raw file has been deleted: ")
+            process.deleted()
         elif event.event_type == 'created':
-            print("New data: Processing!")
-            # do something
+            print("New data: ")
+            process.created()
         else:
             print("What fuck is happening?!")
 
@@ -35,22 +39,6 @@ class MyHandler(PatternMatchingEventHandler):
 def FWatch(checkPath):
     observer = Observer()
     observer.schedule(MyHandler(), path=checkPath)
-    observer.start()
-
-    print("Osservo!")
-
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
-
-    observer.join()
-
-if __name__ == '__main__':
-    args = sys.argv[1:]
-    observer = Observer()
-    observer.schedule(MyHandler(), path=args[0] if args else '.')
     observer.start()
 
     print("Osservo!")
