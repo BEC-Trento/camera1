@@ -7,7 +7,7 @@ from libraries import params
 from libraries import Sis2
 
 source = params.source
-waitForFile = source + "/test-4.ppm"
+waitForFile = source + "/test-0000000003.ppm"
 
 def created(filename):
     if filename == waitForFile:
@@ -31,7 +31,7 @@ def created(filename):
         matplotlib.image.imsave("ref.png",ref)
 
         stamp = params.stamp
-        Sis2.sis_write(0,OD,'mainTest.sis',400,800,stamp)
+        Sis2.sis_write(0,OD*(2**16)/10,'mainTest.sis',400,800,stamp)
     else:
         print("Wait for " + waitForFile)
 
