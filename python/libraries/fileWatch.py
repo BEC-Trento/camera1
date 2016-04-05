@@ -23,10 +23,10 @@ class MyHandler(PatternMatchingEventHandler):
 
         if event.event_type == 'deleted':
             print("The raw file has been deleted: ")
-            process.deleted()
+            process.deleted(str(event.src_path))
         elif event.event_type == 'created':
             print("New data: ")
-            process.created()
+            process.created(str(event.src_path))
         else:
             print("What fuck is happening?!")
 
