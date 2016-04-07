@@ -27,11 +27,11 @@ def created(filename):
 
         #OD = -np.log((atoms[od_crop]-b1[od_crop])/(ref[od_crop]-b2[od_crop]+1))
         OD = -np.log((atoms[od_crop]+1)/(ref[od_crop]+1))
-        matplotlib.image.imsave("atoms.png",atoms)
-        matplotlib.image.imsave("ref.png",ref)
 
         stamp = params.stamp
-        Sis2.sis_write(0,OD*(2**16)/10,'mainTest.sis',400,800,stamp)
+        OD[OD<0] = 0
+        b = ( (2**16/10) * OD )
+        Sis2.sis_write(0,b.astype(np.uint16)+1,'mainTest.sis',400,800,stamp)
     else:
         print("Wait for " + waitForFile)
 
