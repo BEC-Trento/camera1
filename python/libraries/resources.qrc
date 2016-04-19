@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="Icons">
+    <file>resources/open-iconic-master/svg/arrow-circle-bottom.svg</file>
+    <file>resources/open-iconic-master/svg/globe.svg</file>
+    <file>resources/open-iconic-master/svg/home.svg</file>
+  </qresource>
+</RCC>
