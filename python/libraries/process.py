@@ -32,6 +32,7 @@ def created(filename):
         OD[OD<0] = 0
         b = ( (2**16/10) * OD )
         Sis2.sis_write(0,b.astype(np.uint16)+1,'mainTest.sis',400,800,stamp)
+        #Sis2.sis_write_off(0,OD,'mainTest.sis',400,800,stamp)
     else:
         print("Wait for " + waitForFile)
 

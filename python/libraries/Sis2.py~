@@ -98,7 +98,7 @@ def readsis(filename):
         stringa = sisVersion[1:-1] + ' ' + datestamp[2:-1] + ' ' + comment[2:ls+2]
     block = (Bheight,Bwidth)
 
-    print("It says: " + comment[1:ls+2])
+    print("It says: " + comment[1:ls+2] + "...")
     print("...and was created on " + datestamp[1:])
 
     return im0, im1, image, rawdata, stringa , block
@@ -116,6 +116,61 @@ def sis_write(self, image, filename, Bheight, Bwidth, stamp):
             Bwidth (int): the x dimension of the eventual block
             stamp (string): a string to describe who, why and what you want
         """
+        #keep the double-image convention for sis files, filling the unused
+        #with zeros
+        if self == 0:
+            image = np.concatenate((image, np.zeros_like(image)))
+        elif self == 1:
+            image = np.concatenate((np.zeros_like(image), image))
+
+        with open(str(filename), 'w+b') as fid:
+            # Write here SisV2 + other 4 free bytes
+            head = 'SisV2' + '.' + '0'*4
+            fid.write(head.encode())
+
+            # This is OK
+            height, width = image.shape
+            size = np.array([height, width], dtype=np.uint16)
+            size.tofile(fid)
+
+            # Here we put 2*2 more bytes with the sub-block dimension
+            Bsize = np.array([Bheight, Bwidth], dtype=np.uint16)
+            Bsize.tofile(fid)
+
+            # Also a timestamp
+            ts = time.time()
+            phead = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S.')
+            fid.write(phead.encode())
+
+            # More: descriptive stamp
+            ls = np.array([len(stamp)], dtype=np.uint16) # length of the stamp coded at the 38+39 byte
+            ls.tofile(fid)
+            fid.write(stamp.encode())
+            freeHead = '0'*(472-len(stamp))
+            fid.write(freeHead.encode())
+
+            image.astype(np.uint16).tofile(fid)
+
+def sis_write_off(self, OD, filename, Bheight, Bwidth, stamp):
+        """
+        Low-level interaction with the sis file for writing it.
+        Writes the whole image, with the unused part filled with zeros.
+
+        Args:
+            image (np.array): the 2d-array that must be writed after conversion
+            to 16-bit unsigned-integers (must be already normalized)
+            filename (string): sis filename
+            Bheight (int): the y dimension of the eventual block
+            Bwidth (int): the x dimension of the eventual block
+            stamp (string): a string to describe who, why and what you want
+        """
+        #norm = np.array((2,1))
+        norm = np.append(OD.min(), OD.max())
+        par = OD + abs(norm[0])
+        par = par * 6553.6
+        image = par.astype(np.uint16)
+        print(norm.astype(np.uint16))
+
         #keep the double-image convention for sis files, filling the unused
         #with zeros
         if self == 0:
