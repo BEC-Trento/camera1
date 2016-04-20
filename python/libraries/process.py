@@ -1,6 +1,5 @@
-import os, glob
 import numpy as np
-import matplotlib
+import glob
 
 from libraries.read_lib import read_pgm
 from libraries import params
