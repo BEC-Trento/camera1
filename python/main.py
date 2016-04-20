@@ -10,7 +10,11 @@ from PyQt4.QtGui import QMainWindow
 from libraries.mainWindow_ui import Ui_MainWindow
 
 import numpy as np
+import matplotlib
+matplotlib.use('Qt4Agg')
+print('before: ', matplotlib.get_backend())
 import matplotlib.pyplot as plt
+print('after: ', matplotlib.get_backend())
 
 from matplotlib.backends.backend_qt4agg import (
     FigureCanvasQTAgg as FigureCanvas,
