@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="basic-ui">
+    <file>resources/111267-basic-ui/svg/eye-close-up.svg</file>
+    <file>resources/111267-basic-ui/svg/wrench-tool.svg</file>
+    <file>resources/111267-basic-ui/svg/refresh-arrow.svg</file>
+    <file>resources/111267-basic-ui/svg/home-button.svg</file>
+  </qresource>
+</RCC>
