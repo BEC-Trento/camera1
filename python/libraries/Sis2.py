@@ -17,6 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
+from scipy.misc import imsave
+
 import time
 import datetime
 
@@ -150,6 +152,8 @@ def sis_write(self, image, filename, Bheight, Bwidth, stamp):
             fid.write(freeHead.encode())
 
             image.astype(np.uint16).tofile(fid)
+        print('sis written to ' + filename)
+        imsave(filename+'.png', image)
 
 def sis_write_off(self, OD, filename, Bheight, Bwidth, stamp):
         """

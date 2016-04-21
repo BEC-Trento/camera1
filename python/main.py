@@ -16,7 +16,7 @@ matplotlib.use('Qt4Agg')
 import matplotlib.pyplot as plt
 
 from watchdog.observers import Observer
-from libraries.fileWatch import MyHandler
+from libraries.fileWatch import MyHandler, Params
 
 from matplotlib.backends.backend_qt4agg import (
     FigureCanvasQTAgg as FigureCanvas,
@@ -88,8 +88,9 @@ if __name__ == '__main__':
     main = Main()
     main.show()
     
+    params = Params()
     observer = Observer()
-    observer.schedule(MyHandler(), path=checkPath)
+    observer.schedule(MyHandler(params), path=params.source)
     observer.start()
     status = app.exec_()
     observer.stop()
