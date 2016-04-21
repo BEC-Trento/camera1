@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainWindow.ui'
 #
-# Created: Wed Apr 20 19:29:58 2016
+# Created: Thu Apr 21 19:47:12 2016
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -31,17 +31,16 @@ class Ui_MainWindow(object):
         icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/basic-ui/icons/111267-basic-ui/svg/eye-close-up.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setToolTip(_fromUtf8(""))
-        self.centralwidget = QtGui.QWidget(MainWindow)
-        self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
-        self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.odWidget = QtGui.QWidget(self.centralwidget)
+        self.odWidget = OdQWidget(MainWindow)
         self.odWidget.setObjectName(_fromUtf8("odWidget"))
-        self.odLayout = QtGui.QVBoxLayout(self.odWidget)
+        self.verticalLayout = QtGui.QVBoxLayout(self.odWidget)
+        self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
+        self.odWidgetContents = QtGui.QWidget(self.odWidget)
+        self.odWidgetContents.setObjectName(_fromUtf8("odWidgetContents"))
+        self.odLayout = QtGui.QVBoxLayout(self.odWidgetContents)
         self.odLayout.setMargin(0)
         self.odLayout.setObjectName(_fromUtf8("odLayout"))
-        self.verticalLayout.addWidget(self.odWidget)
-        MainWindow.setCentralWidget(self.centralwidget)
+        self.verticalLayout.addWidget(self.odWidgetContents)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1016, 27))
         self.menubar.setObjectName(_fromUtf8("menubar"))
@@ -60,18 +59,13 @@ class Ui_MainWindow(object):
         self.toolBar = QtGui.QToolBar(MainWindow)
         self.toolBar.setObjectName(_fromUtf8("toolBar"))
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
-        self.framesDockWidget = QtGui.QDockWidget(MainWindow)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.framesDockWidget.sizePolicy().hasHeightForWidth())
-        self.framesDockWidget.setSizePolicy(sizePolicy)
+        self.framesDockWidget = FramesQDockWidget(MainWindow)
         self.framesDockWidget.setObjectName(_fromUtf8("framesDockWidget"))
-        self.framesWidget = QtGui.QWidget()
-        self.framesWidget.setObjectName(_fromUtf8("framesWidget"))
-        self.framesLayout = QtGui.QVBoxLayout(self.framesWidget)
+        self.framesDockWidgetContents = QtGui.QWidget()
+        self.framesDockWidgetContents.setObjectName(_fromUtf8("framesDockWidgetContents"))
+        self.framesLayout = QtGui.QVBoxLayout(self.framesDockWidgetContents)
         self.framesLayout.setObjectName(_fromUtf8("framesLayout"))
-        self.framesDockWidget.setWidget(self.framesWidget)
+        self.framesDockWidget.setWidget(self.framesDockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.framesDockWidget)
         self.actionHome = QtGui.QAction(MainWindow)
         icon1 = QtGui.QIcon()
@@ -115,4 +109,6 @@ class Ui_MainWindow(object):
         self.actionInfo.setText(_translate("MainWindow", "Info", None))
         self.actionInfo.setShortcut(_translate("MainWindow", "F11", None))
 
+from libraries.odqwidget_ui import OdQWidget
+from libraries.framesqdockwidget_ui import FramesQDockWidget
 import resources_rc

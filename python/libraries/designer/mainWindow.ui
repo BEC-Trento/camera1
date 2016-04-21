@@ -20,10 +20,10 @@
   <property name="toolTip">
    <string/>
   </property>
-  <widget class="QWidget" name="centralwidget">
+  <widget class="OdQWidget" name="odWidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QWidget" name="odWidget" native="true">
+     <widget class="QWidget" name="odWidgetContents" native="true">
       <layout class="QVBoxLayout" name="odLayout"/>
      </widget>
     </item>
@@ -80,20 +80,14 @@
    <addaction name="actionHome"/>
    <addaction name="actionRefresh"/>
   </widget>
-  <widget class="QDockWidget" name="framesDockWidget">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
+  <widget class="FramesQDockWidget" name="framesDockWidget">
    <property name="windowTitle">
     <string>Raw frames</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
-   <widget class="QWidget" name="framesWidget">
+   <widget class="QWidget" name="framesDockWidgetContents">
     <layout class="QVBoxLayout" name="framesLayout"/>
    </widget>
   </widget>
@@ -131,6 +125,20 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FramesQDockWidget</class>
+   <extends>QDockWidget</extends>
+   <header>libraries/framesqdockwidget_ui.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>OdQWidget</class>
+   <extends>QWidget</extends>
+   <header>libraries/odqwidget_ui.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>
