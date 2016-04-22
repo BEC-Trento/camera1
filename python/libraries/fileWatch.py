@@ -13,7 +13,7 @@ class Params():
         #source = os.path.realpath('../data/samples/')
         self.source = os.path.realpath('.')
         self.imshow_kwargs = {'cmap': 'gist_stern'}
-        
+
 
 class MyHandler(PatternMatchingEventHandler):
     """
@@ -24,21 +24,21 @@ class MyHandler(PatternMatchingEventHandler):
         event.src_path
             path/to/observed/file
     """
-    def __init__(self, params, setMainWindow):        
-        self.mainWindow = setMainWindow        
+    def __init__(self, params, setMainWindow):
+        self.mainWindow = setMainWindow
         self.params = params
-        
+
         super(MyHandler, self).__init__(patterns=self.params.patterns)
         self.source = self.params.source
 #        self.waitForFile = self.source + "/test-0000000003.ppm"
         self.counter = 0
-        
+
 
     def on_deleted(self, event):
         print(str(event.src_path) + ' ' + str(event.event_type))
         print("The raw file has been deleted: ")
         print("Ready!")
-        
+
 
     def on_created(self, event):
         print(str(event.src_path) + ' ' + str(event.event_type))
@@ -56,8 +56,8 @@ class MyHandler(PatternMatchingEventHandler):
             self.created_last()
             self.mainWindow.plotAcquired()
             self.removeFiles()
-        
-        
+
+
     def created_last(self,):
         print("Processing!")
         atoms, ref, b1, b2 = self.mainWindow.framesImageList
@@ -72,12 +72,12 @@ class MyHandler(PatternMatchingEventHandler):
         b = ( (2**16/10) * OD )
         Sis2.sis_write(0,b.astype(np.uint16)+1,'mainTest.sis',400,800,stamp)
         #Sis2.sis_write_off(0,OD,'mainTest.sis',400,800,stamp)
-        
+
     def removeFiles(self,):
         print(self.mainWindow.framesPathList)
         for file in self.mainWindow.framesPathList:
                 try:
-                    os.rename(file, os.path.join('/home/carmelo/camera/python/stingray/',os.path.split(file)[1]))
+                    os.rename(file, os.path.join('./stingray/',os.path.split(file)[1]))
     #                os.remove(file)
                 except OSError:
                     pass
