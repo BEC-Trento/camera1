@@ -27,28 +27,20 @@ class FramesQWidget(QWidget):
     def setupUi(self, setMainWindow):
         self.mainWindow = setMainWindow
         
-        self.figureA, self.axesA = plt.subplots(1,1,figsize=(1,4))
-        self.axesA.set(xticks=[], yticks=[])
-        self.figureA.set_facecolor('none')
-        self.canvasA = FigureCanvas(self.figureA)
-        self.toolbarA = NavigationToolbarShort(self.canvasA, self, coordinates=False)
-        self.toolbarA.setOrientation(Qt.Horizontal)
+        self.figure, self.axes = plt.subplots(2,1,figsize=(1,4), 
+                                              sharex=True, sharey=True)
+        self.axesA, self.axesB = self.axes
+        for ax in self.axes:
+            ax.set(xticks=[], yticks=[])
+            ax.plot(np.random.rand(5))
+            
+        self.figure.set_facecolor('none')
+        self.canvas = FigureCanvas(self.figure)
+        self.toolbar = NavigationToolbarShort(self.canvas, self, coordinates=False)
+        self.toolbar.setOrientation(Qt.Horizontal)
         
-        self.mainWindow.verticalLayoutA.addWidget(self.canvasA)
-        self.mainWindow.verticalLayoutA.addWidget(self.toolbarA)
-        self.axesA.plot(np.random.rand(5), 'b')
-        self.canvasA.draw()
+        self.mainWindow.framesPlotLayout.addWidget(self.canvas)
+        self.mainWindow.framesPlotLayout.addWidget(self.toolbar)
+        self.canvas.draw()
         
-        self.figureB, self.axesB = plt.subplots(1,1,figsize=(1,4))
-        self.axesB.set(xticks=[], yticks=[])
-        self.figureB.set_facecolor('none')
-        self.canvasB = FigureCanvas(self.figureB)
-        self.toolbarB = NavigationToolbarShort(self.canvasB, self, coordinates=False)
-        self.toolbarB.setOrientation(Qt.Horizontal)
-        self.mainWindow.verticalLayoutB.addWidget(self.canvasB)
-        self.mainWindow.verticalLayoutB.addWidget(self.toolbarB)
-        self.axesB.plot(np.random.rand(5))
-        self.canvasB.draw()
-        
-        self.axes = [self.axesA, self.axesB]
 
