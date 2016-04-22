@@ -24,7 +24,8 @@ class FramesQDockWidget(QDockWidget):
         super(FramesQDockWidget, self).__init__(*args, **kwargs)
 
     
-    def setupUi(self,):
+    def setupUi(self, setMainWindow):
+        self.mainWindow = setMainWindow
         self.figure, self.axes = plt.subplots(4,1, figsize=(2,6), sharex=True)
         for ax in self.axes:
             ax.set_xticks([])
@@ -34,6 +35,6 @@ class FramesQDockWidget(QDockWidget):
         self.canvas = FigureCanvas(self.figure)
         self.toolbar = NavigationToolbarShort(self.canvas, self, coordinates=True)
         self.toolbar.setOrientation(Qt.Horizontal)
-        self.parent().framesLayout.addWidget(self.canvas)
-        self.parent().framesLayout.addWidget(self.toolbar)
+        self.mainWindow.framesLayout.addWidget(self.canvas)
+        self.mainWindow.framesLayout.addWidget(self.toolbar)
         self.canvas.draw()

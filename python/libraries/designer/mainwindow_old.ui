@@ -20,10 +20,13 @@
   <property name="toolTip">
    <string/>
   </property>
-  <widget class="OdQWidget" name="odWidget">
+  <property name="documentMode">
+   <bool>false</bool>
+  </property>
+  <widget class="QWidget" name="mainWindowContents">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QWidget" name="odWidgetContents" native="true">
+     <widget class="OdQWidget" name="odWidget" native="true">
       <layout class="QVBoxLayout" name="odLayout"/>
      </widget>
     </item>
@@ -66,7 +69,6 @@
    <addaction name="menuPlot"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
@@ -91,6 +93,7 @@
     <layout class="QVBoxLayout" name="framesLayout"/>
    </widget>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
   <action name="actionHome">
    <property name="icon">
     <iconset resource="resources.qrc">

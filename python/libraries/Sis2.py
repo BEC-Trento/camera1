@@ -153,7 +153,7 @@ def sis_write(self, image, filename, Bheight, Bwidth, stamp):
 
             image.astype(np.uint16).tofile(fid)
         print('sis written to ' + filename)
-        imsave(filename+'.png', image)
+        imsave(filename+'.png', image/image.max())
 
 def sis_write_off(self, OD, filename, Bheight, Bwidth, stamp):
         """

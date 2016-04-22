@@ -52,7 +52,7 @@ class MyHandler(PatternMatchingEventHandler):
                 imlist.append(im)
     
             atoms, ref, b1, b2 = imlist
-            od_crop = (slice(800,1200), slice(200,1000))
+            od_crop = (slice(None), slice(None))
     
             #OD = -np.log((atoms[od_crop]-b1[od_crop])/(ref[od_crop]-b2[od_crop]+1))
             OD = -np.log((atoms[od_crop]+1)/(ref[od_crop]+1))

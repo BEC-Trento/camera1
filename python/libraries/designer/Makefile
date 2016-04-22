@@ -7,7 +7,8 @@ COMPILED_DIR = ..
 COMPILED_RESOURCES_DIR = ../..
  
 #UI files to compile
-UI_FILES = $(wildcard *.ui)
+#UI_FILES = $(wildcard *.ui)
+UI_FILES = mainwindow.ui
 #Qt resource files to compile
 RESOURCES = resources.qrc 
  

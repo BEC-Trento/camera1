@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainWindow.ui'
+# Form implementation generated from reading ui file 'mainwindow_old.ui'
 #
-# Created: Thu Apr 21 19:47:12 2016
+# Created: Fri Apr 22 11:33:30 2016
 #      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -31,16 +31,17 @@ class Ui_MainWindow(object):
         icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/basic-ui/icons/111267-basic-ui/svg/eye-close-up.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setToolTip(_fromUtf8(""))
-        self.odWidget = OdQWidget(MainWindow)
-        self.odWidget.setObjectName(_fromUtf8("odWidget"))
-        self.verticalLayout = QtGui.QVBoxLayout(self.odWidget)
+        MainWindow.setDocumentMode(False)
+        self.mainWindowContents = QtGui.QWidget(MainWindow)
+        self.mainWindowContents.setObjectName(_fromUtf8("mainWindowContents"))
+        self.verticalLayout = QtGui.QVBoxLayout(self.mainWindowContents)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
-        self.odWidgetContents = QtGui.QWidget(self.odWidget)
-        self.odWidgetContents.setObjectName(_fromUtf8("odWidgetContents"))
-        self.odLayout = QtGui.QVBoxLayout(self.odWidgetContents)
-        self.odLayout.setMargin(0)
+        self.odWidget = OdQWidget(self.mainWindowContents)
+        self.odWidget.setObjectName(_fromUtf8("odWidget"))
+        self.odLayout = QtGui.QVBoxLayout(self.odWidget)
         self.odLayout.setObjectName(_fromUtf8("odLayout"))
-        self.verticalLayout.addWidget(self.odWidgetContents)
+        self.verticalLayout.addWidget(self.odWidget)
+        MainWindow.setCentralWidget(self.mainWindowContents)
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1016, 27))
         self.menubar.setObjectName(_fromUtf8("menubar"))
@@ -53,9 +54,6 @@ class Ui_MainWindow(object):
         self.menuView = QtGui.QMenu(self.menubar)
         self.menuView.setObjectName(_fromUtf8("menuView"))
         MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtGui.QStatusBar(MainWindow)
-        self.statusbar.setObjectName(_fromUtf8("statusbar"))
-        MainWindow.setStatusBar(self.statusbar)
         self.toolBar = QtGui.QToolBar(MainWindow)
         self.toolBar.setObjectName(_fromUtf8("toolBar"))
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
@@ -67,6 +65,9 @@ class Ui_MainWindow(object):
         self.framesLayout.setObjectName(_fromUtf8("framesLayout"))
         self.framesDockWidget.setWidget(self.framesDockWidgetContents)
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.framesDockWidget)
+        self.statusBar = QtGui.QStatusBar(MainWindow)
+        self.statusBar.setObjectName(_fromUtf8("statusBar"))
+        MainWindow.setStatusBar(self.statusBar)
         self.actionHome = QtGui.QAction(MainWindow)
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(_fromUtf8(":/basic-ui/icons/111267-basic-ui/svg/home-button.svg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
