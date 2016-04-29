@@ -49,6 +49,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.actionInfo.triggered.connect(self.infoBox)
         self.actionRefresh.triggered.connect(self.refreshPlots)
         
+        
     def connectInputWidget(self):
         self.numberOfFramesSpinBox.valueChanged.connect(self.setMaxima)
         self.sourceFolderLineEdit.editingFinished.connect(
@@ -81,15 +82,23 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
     def infoBox(self,):
         QtGui.QMessageBox.about(self, PROG_NAME, PROG_COMMENT+'\n v. '+PROG_VERSION)
         
-    def refreshPlots(self,):
+    def refreshOd(self,):
+        self.odWidget.axes.cla()
+        self.odWidget.axes.imshow(self.currentImage, **self.params.imshow_kwargs)
+        self.framesWidget.canvas.draw()
+        self.odWidget.canvas.draw()
+        
+    def refreshFrames(self,):
         for ax in self.framesWidget.axes:
             ax.cla()
             ax.set(xticks=[], yticks=[])
-            ax.plot(np.random.rand(5))
-        self.odWidget.axes.cla()
-        self.odWidget.axes.plot(np.random.rand(10))
-        self.framesWidget.canvas.draw()
-        self.odWidget.canvas.draw()
+        self.framesWidget.axesA.imshow(self.framesImageList[self.plotFrameASpinBox.value()-1], **self.params.imshow_kwargs)
+        self.framesWidget.axesB.imshow(self.framesImageList[self.plotFrameBSpinBox.value()-1], **self.params.imshow_kwargs)
+        
+    def refreshPlots(self,):
+        self.refreshFrames()
+        self.refreshOd()
+        
         
     def plotAcquired(self,):
         for ax in self.framesWidget.axes:
