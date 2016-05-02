@@ -52,6 +52,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         
     def connectInputWidget(self):
         self.numberOfFramesSpinBox.valueChanged.connect(self.setMaxima)
+        self.plotFrameASpinBox.valueChanged.connect(self.refreshFrames)
+        self.plotFrameBSpinBox.valueChanged.connect(self.refreshFrames)
         self.sourceFolderLineEdit.editingFinished.connect(
             lambda: self.observerReboot(self.sourceFolderLineEdit.text())) 
     
@@ -89,6 +91,9 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.odWidget.canvas.draw()
         
     def refreshFrames(self,):
+        if len(self.framesImageList) == 0:
+            print('No list')
+            return
         for ax in self.framesWidget.axes:
             ax.cla()
             ax.set(xticks=[], yticks=[])
