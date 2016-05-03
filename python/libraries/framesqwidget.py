@@ -26,6 +26,7 @@ class FramesQWidget(QWidget):
     
     def setupUi(self, setMainWindow):
         self.mainWindow = setMainWindow
+        self.imshow_kwargs = {'cmap': 'gray'}
         
         self.figure, self.axes = plt.subplots(2,1,figsize=(1,4), 
                                               sharex=True, sharey=True)

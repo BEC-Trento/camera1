@@ -11,6 +11,7 @@ from libraries.mainwindow_ui import Ui_MainWindow
 
 import numpy as np
 import matplotlib
+from matplotlib.pyplot import colorbar
 matplotlib.use('Qt4Agg')
 
 
@@ -47,7 +48,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         
     def connectActions(self):
         self.actionInfo.triggered.connect(self.infoBox)
-        self.actionRefresh.triggered.connect(self.refreshPlots)
+        self.actionRefresh.triggered.connect(self.plotAcquired)
         
         
     def connectInputWidget(self):
@@ -86,35 +87,27 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         
     def refreshOd(self,):
         self.odWidget.axes.cla()
-        self.odWidget.axes.imshow(self.currentImage, **self.params.imshow_kwargs)
-        self.framesWidget.canvas.draw()
+        i = self.odWidget.axes.imshow(self.currentImage, **self.odWidget.imshow_kwargs)
+        colorbar(i, cax=self.odWidget.cax, **self.odWidget.kk)
         self.odWidget.canvas.draw()
         
     def refreshFrames(self,):
         if len(self.framesImageList) == 0:
             print('No list')
-            return
-        for ax in self.framesWidget.axes:
-            ax.cla()
-            ax.set(xticks=[], yticks=[])
-        self.framesWidget.axesA.imshow(self.framesImageList[self.plotFrameASpinBox.value()-1], **self.params.imshow_kwargs)
-        self.framesWidget.axesB.imshow(self.framesImageList[self.plotFrameBSpinBox.value()-1], **self.params.imshow_kwargs)
-        
-    def refreshPlots(self,):
+        else:
+            print(len(self.framesImageList))
+            print('refreshing')
+            for ax in self.framesWidget.axes:
+                ax.cla()
+                ax.set(xticks=[], yticks=[])
+            self.framesWidget.axesA.imshow(self.framesImageList[self.plotFrameASpinBox.value()-1], **self.framesWidget.imshow_kwargs)
+            self.framesWidget.axesB.imshow(self.framesImageList[self.plotFrameBSpinBox.value()-1], **self.framesWidget.imshow_kwargs)
+            self.framesWidget.canvas.draw()
+            
+    def plotAcquired(self,):
         self.refreshFrames()
         self.refreshOd()
-        
-        
-    def plotAcquired(self,):
-        for ax in self.framesWidget.axes:
-            ax.cla()
-            ax.set(xticks=[], yticks=[])
-        self.framesWidget.axesA.imshow(self.framesImageList[self.plotFrameASpinBox.value()-1], **self.params.imshow_kwargs)
-        self.framesWidget.axesB.imshow(self.framesImageList[self.plotFrameBSpinBox.value()-1], **self.params.imshow_kwargs)
-        self.odWidget.axes.cla()
-        self.odWidget.axes.imshow(self.currentImage, **self.params.imshow_kwargs)
-        self.framesWidget.canvas.draw()
-        self.odWidget.canvas.draw()
+
 
 if __name__ == '__main__':
     import sys  

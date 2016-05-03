@@ -11,8 +11,7 @@ class Params():
         self.patterns = ["*.ppm"]
         self.stamp = 'Coriander-BEC3-mainTest'
         #source = os.path.realpath('../data/samples/')
-        self.source = os.path.realpath('.')
-        self.imshow_kwargs = {'cmap': 'gist_stern'}
+        self.source = os.path.realpath('./raw')
 
 
 class MyHandler(PatternMatchingEventHandler):
@@ -70,6 +69,7 @@ class MyHandler(PatternMatchingEventHandler):
         stamp = self.params.stamp
         OD[OD<0] = 0
         b = ( (2**16/10) * OD )
+        print('Written Sis with dimensions', b.shape)
         Sis2.sis_write(0,b.astype(np.uint16)+1,'mainTest.sis',400,800,stamp)
         #Sis2.sis_write_off(0,OD,'mainTest.sis',400,800,stamp)
 
@@ -77,8 +77,9 @@ class MyHandler(PatternMatchingEventHandler):
         print(self.mainWindow.framesPathList)
         for file in self.mainWindow.framesPathList:
                 try:
-                    os.rename(file, os.path.join('./stingray/',os.path.split(file)[1]))
-    #                os.remove(file)
+#                    os.rename(file, os.path.join('./raw/trash',os.path.split(file)[1]))
+                    os.rename(file, os.path.join('./stingray',os.path.split(file)[1]))
+#                    os.remove(file)
                 except OSError:
                     pass
 
