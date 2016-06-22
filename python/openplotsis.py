@@ -39,11 +39,11 @@ class RawSis():
 if __name__ == '__main__':
     import sys
     import matplotlib.pyplot as plt
-    sis = RawSis(sys.argv[1])    
+    sis = RawSis('mainTest.sis')#sys.argv[1])    
     fig, (ax1, ax2) = plt.subplots(2,1)
-
-    ax1.imshow(sis.im0)
-    ax2.imshow(sis.im1)
+    dic = {'cmap': 'gist_stern'}
+    ax1.imshow(sis.im0, **dic)
+    ax2.imshow(sis.im1, **dic)
 
     fig.show()
        
