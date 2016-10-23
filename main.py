@@ -62,6 +62,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 #            self.observer.join()
             self.observer.stop()
             print('observer stopped')
+            self.observer.join()
         self.params.source = path
         self.observer = Observer()
         self.observer.schedule(MyHandler(self.params, setMainWindow=self), path=path)
