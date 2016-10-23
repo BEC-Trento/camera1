@@ -5,11 +5,11 @@ Created on Tue Apr 19 19:27:57 2016
 
 @author: carmelo
 """
-from PyQt4 import QtGui
+from PySide import QtGui
 
-from libraries.mainwindow_ui import Ui_MainWindow
+from gui.ui_mainwindow import Ui_MainWindow
 
-import numpy as np
+#import numpy as np
 import matplotlib
 matplotlib.use('Qt4Agg')
 
