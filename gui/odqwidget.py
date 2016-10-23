@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('Qt4Agg')
 import matplotlib.pyplot as plt
+from matplotlib.colorbar import make_axes
 #from matplotlib.figure import Figure
 
 
@@ -23,6 +24,8 @@ class OdQWidget(QWidget):
     
     def setupUi(self, setMainWindow):
         self.mainWindow = setMainWindow
+        self.imshow_kwargs = {'cmap': 'gist_stern', 'vmin': -0.05, 'vmax': 1.5}
+        
         self.figure, self.axes = plt.subplots(1,1, figsize=(9,6))
 #        self.figure = Figure()
 #        self.axes = self.figure.add_subplot(111)
@@ -30,6 +33,8 @@ class OdQWidget(QWidget):
 #        self.axes.set_ylim(0,1)
         self.axes.plot(np.random.rand(10))
         self.figure.set_facecolor('none')
+        self.cax, self.kk = make_axes(self.axes, location='right')
+        self.cax.set(xticks=[], yticks=[])
         self.canvas = FigureCanvas(self.figure)
         self.toolbar = NavigationToolbar(self.canvas, self, coordinates=True)
         self.toolbar.setOrientation(Qt.Horizontal)

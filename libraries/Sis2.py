@@ -52,11 +52,13 @@ def readsis(filename):
     if header[0] == 48:             # 48 is ASCII code for '0': all older sis start with 0
         sisVersion = '  sis1'
         datestamp = ' we do not know'
+        commitProg = '  nothing'
         comment = ' nothing'
     elif header[0:5] == b'SisV2':   # SisV2 print header
         sisVersion = str(header[0:5])
         datestamp = str(header[18:37])
-        comment = str(header[40:])
+        commitProg = str(header[40:48])
+        comment = str(header[48:])
     else:
         print('What fuck are you opening?')
         return True
@@ -101,10 +103,11 @@ def readsis(filename):
 
     print("It says: " + comment[1:ls+2] + "...")
     print("...and was created on " + datestamp[1:])
+    print("The commit of the program is: " + commitProg[2:])
 
-    return im0, im1, image, rawdata, stringa , block
+    return im0, im1, image, rawdata, commitProg, stringa , block
 
-def sis_write(self, image, filename, Bheight, Bwidth, stamp):
+def sis_write(self, image, filename, Bheight, Bwidth, commitProg, stamp):
         """
         Low-level interaction with the sis file for writing it.
         Writes the whole image, with the unused part filled with zeros.
@@ -143,11 +146,12 @@ def sis_write(self, image, filename, Bheight, Bwidth, stamp):
             phead = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S.')
             fid.write(phead.encode())
 
-            # More: descriptive stamp
+            # More: commitProg + descriptive stamp
             ls = np.array([len(stamp)], dtype=np.uint16) # length of the stamp coded at the 38+39 byte
             ls.tofile(fid)
+            fid.write(commitProg[:8].encode())
             fid.write(stamp.encode())
-            freeHead = '0'*(472-len(stamp))
+            freeHead = '0'*(472-len(commitProg[:8]+stamp))
             fid.write(freeHead.encode())
 
             image.astype(np.uint16).tofile(fid)
