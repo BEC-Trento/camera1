@@ -1,5 +1,12 @@
 import numpy as np
+from PIL import Image
 import re
+
+def read_tif(filename):
+    im = Image.open(str(filename))
+    h = ''
+    return h, np.asarray(im)
+
 def read_pgm(filename, byteorder='>', full_output=True):
     """Return image data from a raw PGM file as numpy array.
 
@@ -25,3 +32,5 @@ def read_pgm(filename, byteorder='>', full_output=True):
         return header, image
     else:
         return image
+
+func_dictionary = {'.tif': read_tif, '.tiff': read_tif, '.ppm': read_pgm}

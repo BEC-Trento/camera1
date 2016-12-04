@@ -126,6 +126,8 @@ def sis_write(self, image, filename, Bheight, Bwidth, commitProg, stamp):
             image = np.concatenate((image, np.zeros_like(image)))
         elif self == 1:
             image = np.concatenate((np.zeros_like(image), image))
+        elif self is None:
+            image = np.concatenate((image, image))
 
         with open(str(filename), 'w+b') as fid:
             # Write here SisV2 + other 4 free bytes
