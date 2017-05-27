@@ -10,14 +10,13 @@ from PyQt4 import QtGui
 
 from libraries.mainwindow_ui import Ui_MainWindow
 
-import numpy as np
 import matplotlib
 from matplotlib.pyplot import colorbar
 matplotlib.use('Qt4Agg')
 
 
 from watchdog.observers import Observer
-from libraries.fileWatch import MyHandler, Params, HandlerCloner
+from libraries.fileWatch import MyHandler, Params
 
 PROG_NAME = 'ELENA'
 PROG_COMMENT = 'Eliminate LabVIEW for an Enhanced New Acquisition system'
@@ -29,23 +28,32 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         super(Main, self).__init__()
         self.params = Params()
         self.observer = None
+        self.handler = MyHandler(self.params, setMainWindow=self)
+        self.functions = {'Picture 4 frames': ('make_Picture_NaK_4_CAM', 4),
+                          'Picture 2 frames': ('make_Picture_NaK_2_manual', 2),
+                          'Picture single frame': ('make_Picture_single_frame', 1)}
         
-        self.cloner = Observer()
-        self.cloner_source = r'C:\Users\bec2\Desktop\carmelo_camera\python\raw'
-        self.cloner.schedule(HandlerCloner(), path=str(self.cloner_source))
-        print('cloner scheduled on ', self.cloner_source)
-        self.cloner.start()
+#        self.cloner = Observer()
+#        self.cloner_source = os.path.join(os.getcwd(), 'raw')
+#        self.cloner.schedule(HandlerCloner(), path=str(self.cloner_source))
+#        print('cloner scheduled on ', self.cloner_source)
+#        self.cloner.start()
         
         self.setupUi(self)
         self.destinationLineEdit = QtGui.QLineEdit(self.inputWidget)
         self.destinationLineEdit.setObjectName("destinationLineEdit")
-        self.formLayout.insertRow(1, "Sis file", self.destinationLineEdit)
+        self.formLayout.insertRow(0, "Sis file", self.destinationLineEdit)
         self.destinationLineEdit.setText(os.path.join(self.params.writesis_dest, self.params.sisname))
         self.numberOfFramesSpinBox.setProperty("value", self.params.initNumberOfFrames)
         
+        self.selectFunctions = QtGui.QComboBox(self.inputWidget)
+        self.selectFunctions.addItems(list(self.functions.keys()))
+        self.selectFunctions.setObjectName("selectFunctions")
+        self.formLayout.insertRow(2, "Function", self.selectFunctions)        
+        
         self.deleteButton = QtGui.QPushButton(self.inputWidget)
         self.deleteButton.setObjectName('deleteButton')
-        self.formLayout.insertRow(4, "Delete Raw", self.deleteButton)
+        self.formLayout.insertRow(5, "Delete Raw", self.deleteButton)
         self.deleteButton.setCheckable(True)
         self.deleteButton.setChecked(True)
         self.deleteButton.setText('Yes')
@@ -78,30 +86,34 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.deleteButton.toggled.connect(self.on_toggleDeleteButton)
         
     def connectInputWidget(self):
-        self.numberOfFramesSpinBox.valueChanged.connect(self.setMaxima)
+        self.selectFunctions.currentIndexChanged.connect(self.setMaxima)
         self.plotFrameASpinBox.valueChanged.connect(self.refreshFrames)
         self.plotFrameBSpinBox.valueChanged.connect(self.refreshFrames)
         self.sourceFolderLineEdit.editingFinished.connect(
-            lambda: self.observerReboot(self.sourceFolderLineEdit.text())) 
+            lambda: self.observerReboot(path=self.sourceFolderLineEdit.text())) 
     
-    def observerReboot(self, path=None):
+    def observerReboot(self, path=None, func='Picture 4 frames'):
+        funct, maxf = self.functions[func]
+        self.numberOfFramesSpinBox.setText(str(maxf))
         if self.observer is not None:
 #            self.observer.join()
             self.observer.stop()
             print('observer stopped')
         self.params.source = path
         self.observer = Observer()
-        self.observer.schedule(MyHandler(self.params, setMainWindow=self), path=str(path))
+        self.handler = MyHandler(self.params, setMainWindow=self)
+        self.handler.created_last = getattr(self.handler, funct)
+        self.handler.max_frames = maxf
+        self.observer.schedule(self.handler, path=str(path))
         print('observer scheduled on ', path)
         self.observer.start()
 
 
     def setMaxima(self,):
-        self.framesNumber = self.numberOfFramesSpinBox.value()
+        self.framesNumber = self.functions[self.selectFunctions.currentText()][1]
         self.plotFrameASpinBox.setMaximum(self.framesNumber)
         self.plotFrameBSpinBox.setMaximum(self.framesNumber)
-        self.setBackgroundFrameSpinBox.setMaximum(self.framesNumber)
-        self.observerReboot(self.sourceFolderLineEdit.text())
+        self.observerReboot(func=self.selectFunctions.currentText(), path=self.sourceFolderLineEdit.text())
         
     def resetLists(self,):
         self.framesPathList = []

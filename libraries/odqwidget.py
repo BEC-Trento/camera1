@@ -24,7 +24,7 @@ class OdQWidget(QWidget):
     
     def setupUi(self, setMainWindow):
         self.mainWindow = setMainWindow
-        self.imshow_kwargs = {'cmap': 'gist_stern', 'vmin': -0.05, 'vmax': 1.5}
+        self.imshow_kwargs = {'cmap': 'gist_stern', }#'vmin': -0.05, 'vmax': 1.5}
         
         self.figure, self.axes = plt.subplots(1,1, figsize=(9,6))
 #        self.figure = Figure()
