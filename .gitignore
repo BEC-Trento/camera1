@@ -1,5 +1,6 @@
 # Test files
 *.sis
+libraries/designer*/*
 
 # Spyder project
 .spyproject/*

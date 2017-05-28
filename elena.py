@@ -44,7 +44,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.destinationLineEdit.setObjectName("destinationLineEdit")
         self.formLayout.insertRow(0, "Sis file", self.destinationLineEdit)
         self.destinationLineEdit.setText(os.path.join(self.params.writesis_dest, self.params.sisname))
-        self.numberOfFramesSpinBox.setProperty("value", self.params.initNumberOfFrames)
+        self.nunberOfFramesNumLabel.setProperty("value", self.params.initNumberOfFrames)
         
         self.selectFunctions = QtGui.QComboBox(self.inputWidget)
         self.selectFunctions.addItems(list(self.functions.keys()))
@@ -94,7 +94,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
     
     def observerReboot(self, path=None, func='Picture 4 frames'):
         funct, maxf = self.functions[func]
-        self.numberOfFramesSpinBox.setText(str(maxf))
+        self.nunberOfFramesNumLabel.setText(str(maxf))
         if self.observer is not None:
 #            self.observer.join()
             self.observer.stop()
