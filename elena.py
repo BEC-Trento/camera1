@@ -6,7 +6,7 @@ Created on Tue Apr 19 19:27:57 2016
 @author: carmelo
 """
 import os
-from PyQt4 import QtGui
+from PySide import QtGui
 
 from libraries.mainwindow_ui import Ui_MainWindow
 

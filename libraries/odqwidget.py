@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QWidget
-from PyQt4.QtCore import Qt
+from PySide.QtGui import QWidget
+from PySide.QtCore import Qt
 
 import numpy as np
 import matplotlib

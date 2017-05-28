@@ -4,32 +4,32 @@ RESOURCE_DIR = .
  
 #Directory for compiled resources
 COMPILED_DIR = ..
-COMPILED_RESOURCES_DIR = ../..
+COMPILED_RESOURCES_DIR = ..
  
 #UI files to compile
-#UI_FILES = $(wildcard *.ui)
-UI_FILES = mainwindow.ui
+UI_FILES = $(wildcard $(RESOURCE_DIR)/*.ui)
+#UI_FILES = mainwindow.ui
 #Qt resource files to compile
-RESOURCES = resources.qrc 
+RESOURCES = #   resources.qrc 
  
 #pyuic4 and pyrcc4 binaries
-PYUIC = pyuic4
-PYRCC = pyrcc4
+PYUIC = pyside-uic #pyuic4
+PYRCC = pyside-rcc #pyrcc4
  
 #################################
 # DO NOT EDIT FOLLOWING
  
-COMPILED_UI = $(UI_FILES:%.ui=$(COMPILED_DIR)/%_ui.py)
-COMPILED_RESOURCES = $(RESOURCES:%.qrc=$(COMPILED_RESOURCES_DIR)/%_rc.py)
+COMPILED_UI = $(UI_FILES:$(RESOURCE_DIR)/%.ui=$(COMPILED_DIR)/%_ui.py)
+COMPILED_RESOURCES = $(RESOURCES:$(RESOURCE_DIR)/%.qrc=$(COMPILED_RESOURCES_DIR)/%_rc.py)
  
-all : resources ui 
+all : ui resources
  
 resources : $(COMPILED_RESOURCES) 
  
 ui : $(COMPILED_UI)
  
 $(COMPILED_DIR)/%_ui.py : $(RESOURCE_DIR)/%.ui
-	$(PYUIC) $< -o $@
+	$(PYUIC) $< --from-imports -o $@
  
 $(COMPILED_RESOURCES_DIR)/%_rc.py : $(RESOURCE_DIR)/%.qrc
 	$(PYRCC) $< -py3 -o $@
