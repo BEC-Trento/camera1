@@ -7,6 +7,12 @@
 #
 # WARNING! All changes made in this file will be lost!
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
 from PySide import QtCore, QtGui
 
 try:
@@ -55,7 +61,7 @@ class Ui_MainWindow(object):
         self.framesWidget.setObjectName(_fromUtf8("framesWidget"))
         self.framesGridLayout = QtGui.QGridLayout(self.framesWidget)
         self.framesGridLayout.setObjectName(_fromUtf8("framesGridLayout"))
-        self.plotFrameALabel = QtGui.QLabel(self.framesWidget)
+        self.plotFrameALabel = QtGui.QLabel('FrameA', self.framesWidget,)
         self.plotFrameALabel.setObjectName(_fromUtf8("plotFrameALabel"))
         self.framesGridLayout.addWidget(self.plotFrameALabel, 0, 0, 1, 1)
         self.plotFrameASpinBox = QtGui.QSpinBox(self.framesWidget)
@@ -164,7 +170,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "ELENA", None))
-        self.plotFrameALabel.setText(_translate("MainWindow", "Plot frame A", None))
+#        self.plotFrameALabel.setText(_translate("MainWindow", "Plot frame A", None))
         self.plotFrameBLabel.setText(_translate("MainWindow", "Plot frame B", None))
         self.numberOfFramesNameLabel.setText(_translate("MainWindow", "Number of frames", None))
         self.sourceFolderLabel.setText(_translate("MainWindow", "Source folder", None))

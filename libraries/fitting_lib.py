@@ -7,8 +7,20 @@ Edited on Apr 2015
 
 Module containing the fitting routines.
 """
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import absolute_import
 # pylint: disable=E1101
 
+from builtins import super
+from builtins import range
+from builtins import open
+from builtins import dict
+from builtins import zip
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
 from scipy.optimize import curve_fit, leastsq
 import numpy as np
 import numpy.ma as ma

@@ -1,14 +1,22 @@
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from builtins import super
+from builtins import str
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import os
 import shutil
 import numpy as np
-import pickle
 
 from .read_lib import func_dictionary
 from . import Sis2
 
 from watchdog.events import PatternMatchingEventHandler
 
-class Params():
+class Params(object):
     def __init__(self,):
         self.patterns = ["*.ppm", "*.tif"]
         self.stamp = 'Coriander-BEC3-mainTest'
@@ -250,7 +258,7 @@ class HandlerCloner(PatternMatchingEventHandler):
 
     def on_created(self, event):
         print(str(event.src_path) + ' ' + str(event.event_type))
-        dest = r'C:\Users\bec2\Desktop\carmelo_camera\python\hamamatsu'
+        dest = r'C:/Users/bec2/Desktop/carmelo_camera/python/hamamatsu'
         file = event.src_path
         # os.rename(file, os.path.join(dest,os.path.split(file)[1]))
         shutil.copy(file, dest)
