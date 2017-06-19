@@ -22,7 +22,7 @@ from PySide.QtCore import Slot
 from modules.ui.mainwindow_ui import Ui_MainWindow
 
 from modules.filewatch import Camera
-from modules.functions import cam_presets, pictures_d
+from settings import cam_presets, save_ext_d, pictures_d, default_savedir, default_savename
 
 PROG_NAME = 'ELENA'
 PROG_COMMENT = 'Eliminate LabVIEW for an Enhanced New Acquisition system'
@@ -37,21 +37,17 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         
         self.camera = Camera()
         
-#        d0 = cam_presets['Stingray_Coriander'].copy()
-#        source = d0.pop('source_folder')
-#        d0.update(pictures_d['Picture 4 frames'])
-#        d0['delete_raw'] = self.deleteRawCheckBox.isChecked()
-#        print(d0)
-        
+        self.savedir = default_savedir
+        self.savename = default_savename
+        self.outputLineEdit.setText(os.path.join(self.savedir, self.savename))
+
         self.connectInputWidget()
         self.sourcePresetsComboBox.addItems(list(cam_presets.keys()))
         self.pictureSelectComboBox.addItems(list(pictures_d.keys()))
-#        
-#        self.camera.pic_pars = d0
-#        self.camera.source_folder = source
-        
 
-        self.camera.picture_handler.signalFinalizedPicture.connect(self.plot_finalized)
+        self.camera.picture_handler._slots_on_final.append(self.plot_finalized)
+        self.camera.picture_handler._slots_on_final.append(self.save_image)
+        
         
     def connectActions(self):
         self.actionInfo.triggered.connect(self.infoBox)
@@ -64,6 +60,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.sourceFolderLineEdit.textChanged.connect(self.on_source_folder_changed)
         self.nFramesSpinBox.valueChanged.connect(self.on_n_frames_changed)
         self.deleteRawCheckBox.stateChanged.connect(self.on_delete_raw_state_changed)
+        self.outFolderPushButton.clicked.connect(self.change_savedir)
+        self.outputLineEdit.textChanged.connect(self.change_savedir_manual)
         
     def load_source_presets(self, preset_name):
         sets = cam_presets[preset_name]
@@ -121,7 +119,26 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
     def plot_finalized(self, image):
         print('finalized and plotting')
         self.displayWidget.setImage(image)
-
+        
+    @Slot(np.ndarray)    
+    def save_image(self, image):
+        fname = os.path.join(self.savedir, self.savename)
+        ext = os.path.splitext(self.savename)[1]
+        print(ext)
+        try:
+            save_ext_d[ext](fname, image)
+            print('OD saved to %s'%fname)
+        except KeyError:
+            print('No save function for file type .%s'%ext)
+        
+    def change_savedir(self):
+        d = QtGui.QFileDialog.getExistingDirectory()
+        print('Change savedir to %s'%d)
+        self.outputLineEdit.setText(os.path.join(d, self.savename))   
+        
+    def change_savedir_manual(self):
+        self.savedir, self.savename = os.path.split(self.outputLineEdit.text())
+        
         
     def infoBox(self,):
         QtGui.QMessageBox.about(self, PROG_NAME, PROG_COMMENT+'\n v. '+PROG_VERSION)
@@ -138,7 +155,7 @@ if __name__ == '__main__':
     main.show()
 #    main.observerReboot(path=main.params.source)
     status = app.exec_()
-    main.observer.stop()
-    main.observer.join()
+    main.camera.observer.stop()
+    main.camera.observer.join()
     sys.exit(status)
 

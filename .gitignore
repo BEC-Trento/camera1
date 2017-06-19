@@ -1,6 +1,8 @@
 # Test files
 *.sis
 libraries/designer*/*
+picture_NaK/*
+testing/*
 
 # Spyder project
 .spyproject/*
