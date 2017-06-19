@@ -13,146 +13,121 @@ from builtins import super
 from builtins import str
 from future import standard_library
 standard_library.install_aliases()
+
 import os
+import numpy as np
 from PySide import QtGui
+from PySide.QtCore import Slot
 
-from libraries.mainwindow_ui import Ui_MainWindow
+from modules.ui.mainwindow_ui import Ui_MainWindow
 
-import matplotlib
-from matplotlib.pyplot import colorbar
-matplotlib.use('Qt4Agg')
-
-
-from watchdog.observers import Observer
-from libraries.fileWatch import MyHandler, Params
+from modules.filewatch import Camera
+from modules.functions import cam_presets, pictures_d
 
 PROG_NAME = 'ELENA'
 PROG_COMMENT = 'Eliminate LabVIEW for an Enhanced New Acquisition system'
 PROG_VERSION = '0.9 (beta)'
 
+output_folder = os.path.join(os.getcwd(), 'img')
 
 class Main(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self, ):
         super(Main, self).__init__()
-        self.params = Params()
-        self.observer = None
-        self.handler = MyHandler(self.params, setMainWindow=self)
-        self.functions = {'Picture 4 frames': ('make_Picture_NaK_4_CAM', 4),
-                          'Picture 2 frames': ('make_Picture_NaK_2_manual', 2),
-                          'Picture single frame': ('make_Picture_single_frame', 1)}
-        
-#        self.cloner = Observer()
-#        self.cloner_source = os.path.join(os.getcwd(), 'raw')
-#        self.cloner.schedule(HandlerCloner(), path=str(self.cloner_source))
-#        print('cloner scheduled on ', self.cloner_source)
-#        self.cloner.start()
-        
         self.setupUi(self)
-        self.destinationLineEdit = QtGui.QLineEdit(self.inputWidget)
-        self.destinationLineEdit.setObjectName("destinationLineEdit")
-        self.formLayout.insertRow(0, "Sis file", self.destinationLineEdit)
-        self.destinationLineEdit.setText(os.path.join(self.params.writesis_dest, self.params.sisname))
-        self.nunberOfFramesNumLabel.setProperty("value", self.params.initNumberOfFrames)
         
-        self.selectFunctions = QtGui.QComboBox(self.inputWidget)
-        self.selectFunctions.addItems(list(self.functions.keys()))
-        self.selectFunctions.setObjectName("selectFunctions")
-        self.formLayout.insertRow(2, "Function", self.selectFunctions)        
+        self.camera = Camera()
         
-        self.deleteButton = QtGui.QPushButton(self.inputWidget)
-        self.deleteButton.setObjectName('deleteButton')
-        self.formLayout.insertRow(5, "Delete Raw", self.deleteButton)
-        self.deleteButton.setCheckable(True)
-        self.deleteButton.setChecked(True)
-        self.deleteButton.setText('Yes')
+#        d0 = cam_presets['Stingray_Coriander'].copy()
+#        source = d0.pop('source_folder')
+#        d0.update(pictures_d['Picture 4 frames'])
+#        d0['delete_raw'] = self.deleteRawCheckBox.isChecked()
+#        print(d0)
         
-        self.setWindowTitle(PROG_NAME+' '+PROG_VERSION)
-        self.odWidget.setupUi(self)
-        self.framesWidget.setupUi(self)
-        
-        self.connectActions()
         self.connectInputWidget()
+        self.sourcePresetsComboBox.addItems(list(cam_presets.keys()))
+        self.pictureSelectComboBox.addItems(list(pictures_d.keys()))
+#        
+#        self.camera.pic_pars = d0
+#        self.camera.source_folder = source
         
-        self.framesPathList = []
-        self.framesHeaderList = []
-        self.framesImageList = []
-        self.currentImage = None
-        self.sourceFolderLineEdit.setText(self.params.source)
-        self.setMaxima()
-        
-    def on_toggleDeleteButton(self,):
-        if self.deleteButton.isChecked():
-            self.deleteButton.setText('Yes')
-        else:
-            self.deleteButton.setText('No')
-        pass
-        
+
+        self.camera.picture_handler.signalFinalizedPicture.connect(self.plot_finalized)
         
     def connectActions(self):
         self.actionInfo.triggered.connect(self.infoBox)
-        self.actionRefresh.triggered.connect(self.plotAcquired)
-        self.deleteButton.toggled.connect(self.on_toggleDeleteButton)
+#        self.actionRefresh.triggered.connect(self.plotAcquired)
         
     def connectInputWidget(self):
-        self.selectFunctions.currentIndexChanged.connect(self.setMaxima)
-        self.plotFrameASpinBox.valueChanged.connect(self.refreshFrames)
-        self.plotFrameBSpinBox.valueChanged.connect(self.refreshFrames)
-        self.sourceFolderLineEdit.editingFinished.connect(
-            lambda: self.observerReboot(path=self.sourceFolderLineEdit.text())) 
-    
-    def observerReboot(self, path=None, func='Picture 4 frames'):
-        funct, maxf = self.functions[func]
-        self.nunberOfFramesNumLabel.setText(str(maxf))
-        if self.observer is not None:
-#            self.observer.join()
-            self.observer.stop()
-            print('observer stopped')
-        self.params.source = path
-        self.observer = Observer()
-        self.handler = MyHandler(self.params, setMainWindow=self)
-        self.handler.created_last = getattr(self.handler, funct)
-        self.handler.max_frames = maxf
-        self.observer.schedule(self.handler, path=str(path))
-        print('observer scheduled on ', path)
-        self.observer.start()
-
-
-    def setMaxima(self,):
-        self.framesNumber = self.functions[self.selectFunctions.currentText()][1]
-        self.plotFrameASpinBox.setMaximum(self.framesNumber)
-        self.plotFrameBSpinBox.setMaximum(self.framesNumber)
-        self.observerReboot(func=self.selectFunctions.currentText(), path=self.sourceFolderLineEdit.text())
+        self.sourcePresetsComboBox.currentIndexChanged[str].connect(self.load_source_presets)
+        self.pictureSelectComboBox.currentIndexChanged[str].connect(self.load_picture)
         
-    def resetLists(self,):
-        self.framesPathList = []
-        self.framesHeaderList = []
-        self.framesImageList = []
+        self.sourceFolderLineEdit.textChanged.connect(self.on_source_folder_changed)
+        self.nFramesSpinBox.valueChanged.connect(self.on_n_frames_changed)
+        self.deleteRawCheckBox.stateChanged.connect(self.on_delete_raw_state_changed)
+        
+    def load_source_presets(self, preset_name):
+        sets = cam_presets[preset_name]
+        self.fileExtLineEdit.setText(', '.join(sets['file_ext']))
+        self.sourceFolderLineEdit.setText(str(sets['source_folder']))
+        self.reload_pic_pars()
+        
+    def load_picture(self, pic_name):
+        d = pictures_d[pic_name]
+        n_frames = d['N_frames']
+        if n_frames is not None:
+            self.lock_n_frames(lock=True, value=n_frames)
+        else:
+            self.lock_n_frames(lock=False, value=-1)
+        self.reload_pic_pars()
+        
+    def reload_pic_pars(self,):
+        pars = {}
+        pars.update(cam_presets[self.sourcePresetsComboBox.currentText()])
+        pars.update(pictures_d[self.pictureSelectComboBox.currentText()])
+        pars['source_folder'] = self.sourceFolderLineEdit.text()
+        pars['N_frames'] = self.nFramesSpinBox.value()
+        pars['delete_raw'] = self.deleteRawCheckBox.isChecked()
+        self.camera.pic_pars = pars
+        
+    def on_source_folder_changed(self, path):
+        print('folder changed')
+        self.camera.source_folder = path
+        
+    def on_n_frames_changed(self, n_frames):
+        print('N frames set to %d'%n_frames)
+        self.camera.picture_handler.N_frames = n_frames
+        print(self.camera)
+        
+    def on_delete_raw_state_changed(self,):
+        self.camera.picture_handler.flag_delete_raw = self.deleteRawCheckBox.isChecked()            
+        print(self.camera)
+        
+    def lock_n_frames(self, lock=True, value=1):
+        self.nFramesSpinBox.setValue(value)
+        if lock:
+            self.nFramesSpinBox.setStyleSheet("QSpinBox {\n"
+            "border: 1px solid rgb(0,0,0);\n"
+            "border-radius: 4px;\n"
+            "background-color: rgb(229, 229, 229)\n"
+            "}")
+            self.nFramesSpinBox.setReadOnly(True)
+            self.nFramesSpinBox.setButtonSymbols(QtGui.QAbstractSpinBox.NoButtons)
+        else:
+            self.nFramesSpinBox.setStyleSheet("")
+            self.nFramesSpinBox.setReadOnly(False)
+            self.nFramesSpinBox.setButtonSymbols(QtGui.QAbstractSpinBox.UpDownArrows)
+    
+    @Slot(np.ndarray)
+    def plot_finalized(self, image):
+        print('finalized and plotting')
+        self.displayWidget.setImage(image)
+
         
     def infoBox(self,):
         QtGui.QMessageBox.about(self, PROG_NAME, PROG_COMMENT+'\n v. '+PROG_VERSION)
         
-    def refreshOd(self,):
-        self.odWidget.axes.cla()
-        i = self.odWidget.axes.imshow(self.currentImage, **self.odWidget.imshow_kwargs)
-        colorbar(i, cax=self.odWidget.cax, **self.odWidget.kk)
-        self.odWidget.canvas.draw()
-        
-    def refreshFrames(self,):
-        if len(self.framesImageList) == 0:
-            print('No list')
-        else:
-            print(len(self.framesImageList))
-            print('refreshing')
-            for ax in self.framesWidget.axes:
-                ax.cla()
-                ax.set(xticks=[], yticks=[])
-            self.framesWidget.axesA.imshow(self.framesImageList[self.plotFrameASpinBox.value()-1], **self.framesWidget.imshow_kwargs)
-            self.framesWidget.axesB.imshow(self.framesImageList[self.plotFrameBSpinBox.value()-1], **self.framesWidget.imshow_kwargs)
-            self.framesWidget.canvas.draw()
-            
-    def plotAcquired(self,):
-        self.refreshFrames()
-        self.refreshOd()
+    
+    
 
 
 if __name__ == '__main__':
