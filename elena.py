@@ -14,7 +14,7 @@ from builtins import str
 from future import standard_library
 standard_library.install_aliases()
 
-import os
+import sys, os
 import numpy as np
 from PySide import QtGui
 from PySide.QtCore import Slot
@@ -27,6 +27,8 @@ from settings import cam_presets, save_ext_d, pictures_d, default_savedir, defau
 PROG_NAME = 'ELENA'
 PROG_COMMENT = 'Eliminate LabVIEW for an Enhanced New Acquisition system'
 PROG_VERSION = '0.9 (beta)'
+
+TEXT = str if sys.version_info[0] >= 3 else unicode
 
 output_folder = os.path.join(os.getcwd(), 'img')
 
@@ -54,8 +56,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 #        self.actionRefresh.triggered.connect(self.plotAcquired)
         
     def connectInputWidget(self):
-        self.sourcePresetsComboBox.currentIndexChanged[str].connect(self.load_source_presets)
-        self.pictureSelectComboBox.currentIndexChanged[str].connect(self.load_picture)
+        self.sourcePresetsComboBox.currentIndexChanged[TEXT].connect(self.load_source_presets)
+        self.pictureSelectComboBox.currentIndexChanged[TEXT].connect(self.load_picture)
         
         self.sourceFolderLineEdit.textChanged.connect(self.on_source_folder_changed)
         self.nFramesSpinBox.valueChanged.connect(self.on_n_frames_changed)
