@@ -44,7 +44,7 @@ cam_presets = {
      },
 'Hamamatsu':
     {'file_ext': ['*.tif'],
-     'source_folder': os.path.abspath('raw/hamamatsu'),
+     'source_folder': os.path.abspath('raw'),
      'read_fun': read_tif
      },   
 }

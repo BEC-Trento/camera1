@@ -1,0 +1,9 @@
+matplotlib
+numpy
+pyqtgraph
+Pillow
+PySide
+bottleneck
+future
+presets
+watchdog
