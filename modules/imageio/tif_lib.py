@@ -18,10 +18,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 import numpy as np
-from PIL import Image
+from libtiff import TIFF
+# https://github.com/pearu/pylibtiff
+    
         
 def read_tif(filename, full_output=False):
-    image = Image.open(str(filename))
+    tiff = TIFF.open(filename, mode='r')
+    image = tiff.read_image()
+    tiff.close()
     header = ''
     image = np.asarray(image)
     if full_output:
@@ -29,5 +33,7 @@ def read_tif(filename, full_output=False):
     else:
         return image
 
-def write_tif():
-    raise NotImplementedError
+def write_tif(filename, array):
+    tiff = TIFF.open(str(filename), mode='w')
+    tiff.write_image(array)
+    tiff.close()
