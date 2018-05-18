@@ -20,7 +20,8 @@ import numpy as np
 
 import time
 import datetime
-
+import os
+from io import BytesIO
 
 def readsis(filename, verbose=False):
     ''' Read sis files, both old version and SisV2
@@ -176,7 +177,16 @@ def readsis_quiet(filename, verbose=False):
 
     return im0, im1
 
-
+def sis_writeOUT(filename, binData):
+    """
+    Writing of .sis file using a placeholder tmp file, to avoid reading of
+    incomplete files when transfer speed is low
+    """
+    with open(filename+".tmp", 'w+b') as fid:
+        fid.write(binData)
+    os.rename(filename+".tmp", filename)
+        
+        
 def sis_write(filename, image, Bheight=0, Bwidth=0, commitProg='', stamp='', sisposition=None):
         """
         Low-level interaction with the sis file for writing it.
@@ -199,35 +209,43 @@ def sis_write(filename, image, Bheight=0, Bwidth=0, commitProg='', stamp='', sis
         elif sisposition is None:
             image = np.concatenate((image, image))
 
-        with open(str(filename), 'w+b') as fid:
+        with BytesIO() as fid:
             # Write here SisV2 + other 4 free bytes
             head = 'SisV2' + '.' + '0'*4
             fid.write(head.encode())
-
+    
             # This is OK
             height, width = image.shape
             size = np.array([height, width], dtype=np.uint16)
-            size.tofile(fid)
-
+            fid.write(size.tobytes())
+#            size.tofile(fid)
+    
             # Here we put 2*2 more bytes with the sub-block dimension
             Bsize = np.array([Bheight, Bwidth], dtype=np.uint16)
-            Bsize.tofile(fid)
-
+            fid.write(Bsize.tobytes())
+#            Bsize.tofile(fid)
+    
             # Also a timestamp
             ts = time.time()
             phead = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S.')
             fid.write(phead.encode())
-
+    
             # More: commitProg + descriptive stamp
             ls = np.array([len(stamp)], dtype=np.uint16) # length of the stamp coded at the 38+39 byte
-            ls.tofile(fid)
+            fid.write(ls.tobytes())
+#            ls.tofile(fid)
             fid.write(commitProg[:8].encode())
             fid.write(stamp.encode())
             freeHead = '0'*(472-len(commitProg[:8]+stamp))
             fid.write(freeHead.encode())
             
-            image = image * 2**16/10
-            image.astype(np.uint16).tofile(fid)
+            image += 1
+            image = image * (2**16)/10
+            image = np.clip(image, 1, 2**16-1)
+            fid.write(image.astype(np.uint16).tobytes())
+                
+            sis_writeOUT(filename, fid.getvalue())
+        
         print('sis written to ' + filename)
 
 def sis_write_off(self, OD, filename, Bheight, Bwidth, stamp):

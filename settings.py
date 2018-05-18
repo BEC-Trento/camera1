@@ -22,7 +22,7 @@ import numpy as np
 from modules.imageio import read_pgm, read_tif
 from modules.imageio.sis2_lib import read_sis0, write_sis
 
-default_savedir = os.path.abspath('.')
+default_savedir = '/home/bec/CAM/img' #os.path.abspath('.')
 default_savename = 'test_0.sis'
 
 # all of these function must have the call save(fname, image)
@@ -32,19 +32,19 @@ save_ext_d = {
         }
 
 cam_presets = {
-'Stingray_CAM': 
-    {'file_ext': ['*.sis'],
+'Stingray_horiz':
+    {'file_ext': ['*.tif', '*.tiff'],
      'source_folder': os.path.abspath('raw'),
-     'read_fun': read_sis0
+     'read_fun': read_tif
      },
-'Stingray_Coriander': 
+'Stingray_horiz_ppm':
     {'file_ext': ['*.ppm'],
      'source_folder': os.path.abspath('raw'),
      'read_fun': read_pgm
      },
-'Hamamatsu':
-    {'file_ext': ['*.tif'],
-     'source_folder': os.path.abspath('raw'),
+'Stingray_axial':
+    {'file_ext': ['*.tif', '*.tiff'],
+     'source_folder': os.path.abspath('raw_axial'),
      'read_fun': read_tif
      },   
 }
