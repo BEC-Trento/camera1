@@ -60,6 +60,22 @@ class Ui_MainWindow(object):
         self.deleteRawCheckBox.setChecked(True)
         self.deleteRawCheckBox.setObjectName("deleteRawCheckBox")
         self.gridLayout.addWidget(self.deleteRawCheckBox, 3, 6, 1, 1)
+        
+        self.saveRawLabel = QtGui.QLabel(self.inputWidget)
+        self.saveRawLabel.setObjectName("saveRawLabel")
+        self.gridLayout.addWidget(self.saveRawLabel, 3, 7, 1, 1)
+        self.saveRawCheckBox = QtGui.QCheckBox(self.inputWidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.saveRawCheckBox.sizePolicy().hasHeightForWidth())
+        self.saveRawCheckBox.setSizePolicy(sizePolicy)
+        self.saveRawCheckBox.setText("")
+        self.saveRawCheckBox.setIconSize(QtCore.QSize(24, 24))
+        self.saveRawCheckBox.setChecked(True)
+        self.saveRawCheckBox.setObjectName("saveRawCheckBox")
+        self.gridLayout.addWidget(self.saveRawCheckBox, 3, 8, 1, 1)
+        
         self.fileExtLineEdit = QtGui.QLineEdit(self.inputWidget)
         self.fileExtLineEdit.setStyleSheet("QLineEdit {\n"
 "border: 1px solid rgb(0,0,0);\n"
@@ -155,6 +171,7 @@ class Ui_MainWindow(object):
         self.sourcePresetsLabel.setText(QtGui.QApplication.translate("MainWindow", "Source presets", None, QtGui.QApplication.UnicodeUTF8))
         self.outputLabel.setText(QtGui.QApplication.translate("MainWindow", "Output file", None, QtGui.QApplication.UnicodeUTF8))
         self.deleteRawLabel.setText(QtGui.QApplication.translate("MainWindow", "Delete RAW", None, QtGui.QApplication.UnicodeUTF8))
+        self.saveRawLabel.setText(QtGui.QApplication.translate("MainWindow", "Save RAW.sis", None, QtGui.QApplication.UnicodeUTF8))
         self.sourceFolderLabel.setText(QtGui.QApplication.translate("MainWindow", "Source folder", None, QtGui.QApplication.UnicodeUTF8))
         self.pictureSelectLabel.setText(QtGui.QApplication.translate("MainWindow", "Picture select", None, QtGui.QApplication.UnicodeUTF8))
         self.fileExtLabel.setText(QtGui.QApplication.translate("MainWindow", "file ext", None, QtGui.QApplication.UnicodeUTF8))

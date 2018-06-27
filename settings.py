@@ -22,8 +22,9 @@ import numpy as np
 from modules.imageio import read_pgm, read_tif
 from modules.imageio.sis2_lib import read_sis0, write_sis
 
-default_savedir = '/home/bec/CAM/img' #os.path.abspath('.')
-default_savename = 'test_0.sis'
+default_source = r'C:\SIScam\SIScamProgram\Prog\img\temp_hamamatsu'
+default_savedir = r'C:\SIScam\SIScamProgram\Prog\img'
+default_savename = 'test_1.sis'
 
 # all of these function must have the call save(fname, image)
 save_ext_d = {
@@ -32,42 +33,41 @@ save_ext_d = {
         }
 
 cam_presets = {
-'Stingray_horiz':
+'Hamamatsu':
     {'file_ext': ['*.tif', '*.tiff'],
-     'source_folder': os.path.abspath('raw'),
+     'source_folder': default_source,
      'read_fun': read_tif
      },
-'Stingray_horiz_ppm':
+'Stingray_ppm':
     {'file_ext': ['*.ppm'],
      'source_folder': os.path.abspath('raw'),
      'read_fun': read_pgm
      },
-'Stingray_axial':
-    {'file_ext': ['*.tif', '*.tiff'],
-     'source_folder': os.path.abspath('raw_axial'),
-     'read_fun': read_tif
-     },   
 }
     
 
 
 def finalize_picture_OD_4_frames(frames_list,):
     frames_list = [f.astype(np.float64) for f in frames_list]
-    bg = frames_list[3]
+    bk = 0.5*(frames_list[2] + frames_list[3])
+    print('******* ',bk.shape)
     atoms, probe = frames_list[0:2]
-    atoms = atoms - bg 
-    probe = probe - bg 
-    #TODO: check this step here
-    
-#        OD = -np.log(atoms/probe)
-    OD = np.log((probe+1e-5)/(atoms+1e-5))
-    OD[OD<0] = 0
-    return OD        
+    OD = -np.log((atoms+0.0 - bk)/(probe+0.0 - bk))
+    # OD[OD<0] = 0 ##### NEVER DO IT AGAIN
+    h, w = OD.shape
+    print(h, w)
+    raw_to_save = np.concatenate([atoms - bk, probe - bk])
+    #OD.resize((1234, 1624))
+    # image = np.zeros((1234, 1624))
+    # print(image.shape)
+    # print(image[:h,:w].shape)
+    # image[:h, :w] = OD
+    return OD, raw_to_save
 
 def finalize_picture_1_frame(frames_list,):
     f = frames_list[0]
     frame = f.astype(np.float64)
-    return frame
+    return frame, frame
     
 def finalize_picture_movie_n_frames(frames_list,):
     probe = frames_list[0]
@@ -77,7 +77,7 @@ def finalize_picture_movie_n_frames(frames_list,):
     odlist = []
     for f in frames:
         OD = -np.log((f+1e-5)/(probe+1e-5))
-        OD[OD<0] = 0
+        # OD[OD<0] = 0
         odlist.append(OD)
     h, w = OD.shape
     W = 1624
@@ -90,7 +90,7 @@ def finalize_picture_movie_n_frames(frames_list,):
     for j, od in enumerate(odlist):
         p, q = np.unravel_index(j, dims)
         image[p*h:(p+1)*h, q*w:(q+1)*w] = od
-    return image
+    return image, np.zeros_like(image)
 
 pictures_d = {
 'Picture 4 frames': 

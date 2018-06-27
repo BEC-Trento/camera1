@@ -87,7 +87,9 @@ class PictureBase(PatternMatchingEventHandler):
         super(PictureBase, self).__init__(patterns=file_ext, **kwargs)
 #        QtCore.QObject.__init__(self,)
         self._final_picture = None
+        self._raw_to_save = None
         self._slots_on_final = []
+        self._slots_on_final_raw = []
         self.counter = 0
         self.list_frames = []
         self.set_pic_pars(file_ext, read_fun, finalize_fun, N_frames, delete_raw, **kwargs)
@@ -106,7 +108,17 @@ class PictureBase(PatternMatchingEventHandler):
     def final_picture(self, value):
         self._final_picture = value
         for f in self._slots_on_final:
-            print('about to apply slot %s'%f.__name__)
+            print('about to apply slot: final pic %s'%f.__name__)
+            f(value)
+            
+    @property
+    def raw_to_save(self):
+        return self._raw_to_save
+    @raw_to_save.setter
+    def raw_to_save(self, value):
+        self._raw_to_save = value
+        for f in self._slots_on_final_raw:
+            print('about to apply slot: raw pic %s'%f.__name__)
             f(value)
         
         
@@ -124,22 +136,21 @@ class PictureBase(PatternMatchingEventHandler):
                 os.remove(event.src_path)
             except OSError:
                 pass
-        
         self.counter += 1
         self.list_frames.append(frame)
         print('Read frame #%d'%self.counter)
         print('Nframes = %d'%self.N_frames)
         if self.counter == self.N_frames:
             print('Finalize picture')
-            self.final_picture = self.finalize(self.list_frames)
+            self.final_picture, self.raw_to_save = self.finalize(self.list_frames)
             self.reset()
             print('Ready for new picture')
             
     def finalize(self, *args):
-        final = self.finalize_fun(*args)
+        final, raw = self.finalize_fun(*args)
 #        self.signalFinalizedPicture.emit(final)
         print('FINALIZED')
-        return final
+        return final, raw
   
  
     def reset(self,):

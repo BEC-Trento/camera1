@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!C:\Python36\python3.exe
 # -*- coding: utf-8 -*-
 """
 Created on Tue Apr 19 19:27:57 2016
@@ -24,6 +24,8 @@ from modules.ui.mainwindow_ui import Ui_MainWindow
 from modules.filewatch import Camera
 from settings import cam_presets, save_ext_d, pictures_d, default_savedir, default_savename
 
+from modules.imageio.sis2_lib import write_sis
+
 PROG_NAME = 'ELENA'
 PROG_COMMENT = 'Eliminate LabVIEW for an Enhanced New Acquisition system'
 PROG_VERSION = '0.9 (beta)'
@@ -41,6 +43,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         
         self.savedir = default_savedir
         self.savename = default_savename
+        self.rawsavename = self.savename.replace('test', 'raw')
         self.outputLineEdit.setText(os.path.join(self.savedir, self.savename))
 
         self.connectInputWidget()
@@ -49,6 +52,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
 
         self.camera.picture_handler._slots_on_final.append(self.plot_finalized)
         self.camera.picture_handler._slots_on_final.append(self.save_image)
+        self.camera.picture_handler._slots_on_final_raw.append(self.save_raw)
         
         
     def connectActions(self):
@@ -99,7 +103,8 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         print(self.camera)
         
     def on_delete_raw_state_changed(self,):
-        self.camera.picture_handler.flag_delete_raw = self.deleteRawCheckBox.isChecked()            
+        self.camera.pic_pars['delete_raw'] = self.deleteRawCheckBox.isChecked()
+        self.camera.picture_handler.flag_delete_raw = self.deleteRawCheckBox.isChecked()
         print(self.camera)
         
     def lock_n_frames(self, lock=True, value=1):
@@ -132,6 +137,13 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
             print('OD saved to %s'%fname)
         except KeyError:
             print('No save function for file type .%s'%ext)
+            
+    @Slot(np.ndarray)    
+    def save_raw(self, image):
+        fname = os.path.join(self.savedir, self.rawsavename)
+        write_sis(fname, image, sisposition='single', thalammer=False)
+        print('RAW sis saved to %s'%fname)
+        
         
     def change_savedir(self):
         d = QtGui.QFileDialog.getExistingDirectory()
@@ -140,6 +152,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         
     def change_savedir_manual(self):
         self.savedir, self.savename = os.path.split(self.outputLineEdit.text())
+        self.rawsavename = self.savename.replace('test', 'raw')
         
         
     def infoBox(self,):
