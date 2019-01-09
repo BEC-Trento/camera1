@@ -22,15 +22,18 @@ import os
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
+from numpy import ndarray
+
 
 class Camera():
-    def __init__(self, **kwargs):
-
+    def __init__(self, main, **kwargs):
+        
+        self.main = main
         self.observer = None
         self._source_folder = None
         self._pic_pars = {'file_ext': None, 'read_fun': None,
                          'finalize_fun': None, 'N_frames': None, 'delete_raw': None}
-        self.picture_handler = PictureBase(**self._pic_pars)
+        self.picture_handler = PictureBase(main=main, **self._pic_pars)
         
     @property
     def source_folder(self,):
@@ -83,23 +86,34 @@ class PictureBase(PatternMatchingEventHandler):
         path/to/observed/file
     '''
 #    signalFinalizedPicture = QtCore.Signal(np.ndarray)
-    def __init__(self, file_ext, read_fun, finalize_fun, N_frames, delete_raw, **kwargs):
+    def __init__(self, main, file_ext, read_fun, finalize_fun, N_frames, delete_raw, **kwargs):
+        self.main = main
+        self.display = self.main.displayWidget
         super(PictureBase, self).__init__(patterns=file_ext, **kwargs)
 #        QtCore.QObject.__init__(self,)
         self._final_picture = None
         self._raw_to_save = None
+        self._bgroislice = None
         self._slots_on_final = []
         self._slots_on_final_raw = []
         self.counter = 0
         self.list_frames = []
         self.set_pic_pars(file_ext, read_fun, finalize_fun, N_frames, delete_raw, **kwargs)
         
-    def set_pic_pars(self, file_ext, read_fun, finalize_fun, N_frames, delete_raw, **kwargs):        
+    @property
+    def bgroislice(self):
+        slice, transform = self.display.bgroi.getArraySlice(self.display.image.view(ndarray), self.display.imageItem, axes=(0,1), returnSlice=True)
+        print(slice)
+        self._bgroislice = slice
+        return slice
+        
+    def set_pic_pars(self, file_ext='', read_fun=None, finalize_fun=None, N_frames=0, delete_raw=False, tprobe=0, **kwargs):        
         self._patterns = file_ext
         self.finalize_fun = finalize_fun
         self.N_frames = N_frames
         self.read_fun = read_fun
         self.flag_delete_raw = delete_raw
+        self.tprobe = tprobe
         
     @property
     def final_picture(self):
@@ -138,11 +152,12 @@ class PictureBase(PatternMatchingEventHandler):
                 pass
         self.counter += 1
         self.list_frames.append(frame)
+        # self.main.displayWidget.setImage(frame)
         print('Read frame #%d'%self.counter)
         print('Nframes = %d'%self.N_frames)
         if self.counter == self.N_frames:
             print('Finalize picture')
-            self.final_picture, self.raw_to_save = self.finalize(self.list_frames)
+            self.final_picture, self.raw_to_save = self.finalize(self.list_frames, self.tprobe, self.bgroislice)
             self.reset()
             print('Ready for new picture')
             

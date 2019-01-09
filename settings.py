@@ -22,9 +22,17 @@ import numpy as np
 from modules.imageio import read_pgm, read_tif
 from modules.imageio.sis2_lib import read_sis0, write_sis
 
+from scipy.ndimage import gaussian_filter
+
 default_source = r'C:\SIScam\SIScamProgram\Prog\img\temp_hamamatsu'
 default_savedir = r'C:\SIScam\SIScamProgram\Prog\img'
 default_savename = 'test_1.sis'
+
+C_cam = 1.0463994082840237e+18
+pix_size = 6.5e-6/8.5
+Isat0 = 62.6
+alpha = 1.82
+blur_raw = 1
 
 # all of these function must have the call save(fname, image)
 save_ext_d = {
@@ -44,32 +52,69 @@ cam_presets = {
      'read_fun': read_pgm
      },
 }
+
+def fit_beta(A, B, fit_area, ):
+    a = A[fit_area].ravel()
+    b = B[fit_area].ravel()
+    return (b*a).sum()/(b**2).sum()
     
-
-
-def finalize_picture_OD_4_frames(frames_list,):
-    frames_list = [f.astype(np.float64) for f in frames_list]
-    bk = 0.5*(frames_list[2] + frames_list[3])
-    print('******* ',bk.shape)
-    atoms, probe = frames_list[0:2]
-    OD = -np.log((atoms+0.0 - bk)/(probe+0.0 - bk))
-    # OD[OD<0] = 0 ##### NEVER DO IT AGAIN
-    h, w = OD.shape
-    print(h, w)
-    raw_to_save = np.concatenate([atoms - bk, probe - bk])
-    #OD.resize((1234, 1624))
-    # image = np.zeros((1234, 1624))
-    # print(image.shape)
-    # print(image[:h,:w].shape)
-    # image[:h, :w] = OD
+def load_frames_ODs(frames_list, tprobe, roislice, *args):
+    frames_list0 = [f.astype(np.float64) for f in frames_list]
+    frames_list = [gaussian_filter(f, blur_raw) for f in frames_list0]
+    #dead_pixels = (np.array([ 539,  763, 1234, 1760], dtype=np.int64), np.array([1259,  283,  372,  392], dtype=np.int64))
+    # for f in frames_list:
+        # f[dead_pixels] = 0
+    F1, F2 = frames_list[0:2]
+    B = frames_list[2]
+    Bm = B.mean()
+    print('******* ',F1.shape)
+    beta = fit_beta(F1-Bm, F2-Bm, roislice)
+    print(beta)
+    atoms = F1 - Bm
+    probe = beta*(F2 - Bm)
+    ODlog = np.log(probe/atoms)
+    Isatcount = C_cam*tprobe*Isat0*pix_size**2
+    ODlin = (probe - atoms)/Isatcount
+    cam_count = probe[roislice].mean()
+    noise_count = frames_list[2].std()
+    s0 = cam_count/Isatcount
+    Nphot = tprobe*30.67e6*s0/(s0+alpha)
+    s = '''    probe_time : {:.2f} us
+    s0 : {:.3f}
+    Nphot: {:.3f}
+    cam count: {:.2f} + {:.2f} ({:.1f}) bkg
+    max OD: {:.1f} + {:.1f}
+    '''.format(tprobe*1e6, s0, Nphot, cam_count, Bm, noise_count,
+               alpha*np.log(cam_count/noise_count), cam_count/Isatcount)
+    print(s)
+    raw_to_save = np.concatenate(frames_list0[:-1])
+    return ODlin, ODlog, raw_to_save
+    
+    
+def finalize_picture_5_extra_frame(frames_list, tprobe, roislice, *args):
+    frames_list.pop(0)
+    ODlin, ODlog, raw_to_save = load_frames_ODs(frames_list, tprobe, roislice, *args)
+    OD = alpha*ODlog
+    return OD, raw_to_save
+	
+def finalize_picture_5_extra_frame_Isat(frames_list, tprobe, roislice, *args):
+    frames_list.pop(0)
+    ODlin, ODlog, raw_to_save = load_frames_ODs(frames_list, tprobe, roislice, *args)
+    OD = ODlin + alpha*ODlog
     return OD, raw_to_save
 
-def finalize_picture_1_frame(frames_list,):
+    
+def finalize_picture_OD_4_frames(frames_list, tprobe, roislice, *args):
+    ODlin, ODlog, raw_to_save = load_frames_ODs(frames_list, tprobe, roislice, *args)
+    OD = alpha*ODlog
+    return OD, raw_to_save
+
+def finalize_picture_1_frame(frames_list, *args):
     f = frames_list[0]
     frame = f.astype(np.float64)
     return frame, frame
     
-def finalize_picture_movie_n_frames(frames_list,):
+def finalize_picture_movie_n_frames(frames_list, *args):
     probe = frames_list[0]
     frames = frames_list[1:]
     Nframes = len(frames)
@@ -97,6 +142,14 @@ pictures_d = {
     {'finalize_fun': finalize_picture_OD_4_frames,
      'N_frames': 4,
      },
+'Picture 5 extra frame':
+    {'finalize_fun': finalize_picture_5_extra_frame,
+     'N_frames': 5,
+     },
+'Picture 5 extra frame Isat':
+    {'finalize_fun': finalize_picture_5_extra_frame_Isat,
+     'N_frames': 5,
+     },
 'Picture single frame': 
     {'finalize_fun': finalize_picture_1_frame,
      'N_frames': 1,
@@ -106,3 +159,5 @@ pictures_d = {
      'N_frames': None,
      },
 }
+
+default_fun = 'Picture 5 extra frame Isat'

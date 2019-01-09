@@ -99,6 +99,12 @@ class DisplayQWidget(QtGui.QWidget):
         
         self.noRepeatKeys = [QtCore.Qt.Key_Right, QtCore.Qt.Key_Left, QtCore.Qt.Key_Up, QtCore.Qt.Key_Down, QtCore.Qt.Key_PageUp, QtCore.Qt.Key_PageDown]
         
+        self.bgroi = pg.RectROI(pos=[10,10], size=[2000,200],  pen='r',)
+        self.bgroi.addScaleHandle([1, 1], [0, 0])
+        self.bgroi.addRotateHandle([0, 0], [0.5, 0.5])
+        self.view.addItem(self.bgroi)
+        
+        self.setImage(np.ones((2048, 2048)))
         
     def setImage(self, img, tvals=None, autoRange=True, autoLevels=False, levels=None, axes=None, pos=None, scale=None, transform=None, autoHistogramRange=True):
         """

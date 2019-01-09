@@ -22,7 +22,7 @@ from PySide.QtCore import Slot
 from modules.ui.mainwindow_ui import Ui_MainWindow
 
 from modules.filewatch import Camera
-from settings import cam_presets, save_ext_d, pictures_d, default_savedir, default_savename
+from settings import cam_presets, save_ext_d, pictures_d, default_savedir, default_savename, default_fun
 
 from modules.imageio.sis2_lib import write_sis
 
@@ -39,7 +39,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         super(Main, self).__init__()
         self.setupUi(self)
         
-        self.camera = Camera()
+        self.camera = Camera(main=self)
         
         self.savedir = default_savedir
         self.savename = default_savename
@@ -54,6 +54,9 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         self.camera.picture_handler._slots_on_final.append(self.save_image)
         self.camera.picture_handler._slots_on_final_raw.append(self.save_raw)
         
+        self.on_tprobe_changed()
+        self.pictureSelectComboBox.setCurrentIndex(self.pictureSelectComboBox.findText(default_fun))
+        
         
     def connectActions(self):
         self.actionInfo.triggered.connect(self.infoBox)
@@ -65,6 +68,7 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         
         self.sourceFolderLineEdit.textChanged.connect(self.on_source_folder_changed)
         self.nFramesSpinBox.valueChanged.connect(self.on_n_frames_changed)
+        self.tProbeSpinBox.valueChanged.connect(self.on_tprobe_changed)
         self.deleteRawCheckBox.stateChanged.connect(self.on_delete_raw_state_changed)
         self.outFolderPushButton.clicked.connect(self.change_savedir)
         self.outputLineEdit.textChanged.connect(self.change_savedir_manual)
@@ -91,7 +95,9 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         pars['source_folder'] = self.sourceFolderLineEdit.text()
         pars['N_frames'] = self.nFramesSpinBox.value()
         pars['delete_raw'] = self.deleteRawCheckBox.isChecked()
+        pars['tprobe'] = self.tProbeSpinBox.value()*1e-6
         self.camera.pic_pars = pars
+        self.camera.picture_handler.set_pic_pars(**pars)
         
     def on_source_folder_changed(self, path):
         print('folder changed')
@@ -103,8 +109,13 @@ class Main(QtGui.QMainWindow, Ui_MainWindow):
         print(self.camera)
         
     def on_delete_raw_state_changed(self,):
-        self.camera.pic_pars['delete_raw'] = self.deleteRawCheckBox.isChecked()
+        self.camera.pic_pars['delete_raw'] = self.tProbeSpinBox.value()*1e-6
         self.camera.picture_handler.flag_delete_raw = self.deleteRawCheckBox.isChecked()
+        print(self.camera)
+        
+    def on_tprobe_changed(self,):
+        self.camera.pic_pars['tprobe'] = self.tProbeSpinBox.value()*1e-6
+        self.camera.picture_handler.tprobe = self.tProbeSpinBox.value()*1e-6
         print(self.camera)
         
     def lock_n_frames(self, lock=True, value=1):

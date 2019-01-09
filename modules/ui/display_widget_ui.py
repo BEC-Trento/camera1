@@ -75,4 +75,4 @@ class Ui_DisplayWidget(object):
     def retranslateUi(self, DisplayWidget):
         DisplayWidget.setWindowTitle(QtGui.QApplication.translate("DisplayWidget", "Display image", None, QtGui.QApplication.UnicodeUTF8))
 
-from pyqtgraph import HistogramLUTWidget, GraphicsView, PlotWidget
+from pyqtgraph import HistogramLUTWidget, GraphicsView, PlotWidget, RectROI

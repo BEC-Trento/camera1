@@ -64,6 +64,7 @@ class Ui_MainWindow(object):
         self.saveRawLabel = QtGui.QLabel(self.inputWidget)
         self.saveRawLabel.setObjectName("saveRawLabel")
         self.gridLayout.addWidget(self.saveRawLabel, 3, 7, 1, 1)
+        
         self.saveRawCheckBox = QtGui.QCheckBox(self.inputWidget)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -75,6 +76,27 @@ class Ui_MainWindow(object):
         self.saveRawCheckBox.setChecked(True)
         self.saveRawCheckBox.setObjectName("saveRawCheckBox")
         self.gridLayout.addWidget(self.saveRawCheckBox, 3, 8, 1, 1)
+        
+        self.tProbeSpinBox = QtGui.QDoubleSpinBox(self.inputWidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tProbeSpinBox.sizePolicy().hasHeightForWidth())
+        self.tProbeSpinBox.setSizePolicy(sizePolicy)
+        self.tProbeSpinBox.setMinimum(0)
+        self.tProbeSpinBox.setMaximum(1000)
+        self.tProbeSpinBox.setSingleStep(1)
+        self.tProbeSpinBox.setValue(10)
+        self.tProbeSpinBox.setSuffix(' us')
+        #self.tProbeSpinBox.setIconSize(QtCore.QSize(24, 24))
+        #self.tProbeSpinBox.setText("Probe time")
+        self.tProbeSpinBox.setObjectName("tProbeSpinBox")
+        self.gridLayout.addWidget(self.tProbeSpinBox, 3, 9, 1, 1)
+        
+        self.tProbeLabel = QtGui.QLabel(self.inputWidget)
+        self.tProbeLabel.setObjectName("tProbeLabel")
+        self.tProbeLabel.setText('t probe')
+        self.gridLayout.addWidget(self.tProbeLabel, 3, 10, 1, 1)
         
         self.fileExtLineEdit = QtGui.QLineEdit(self.inputWidget)
         self.fileExtLineEdit.setStyleSheet("QLineEdit {\n"
